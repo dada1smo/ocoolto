@@ -2,13 +2,15 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import friendValidationSchema from '../validations/friend.validation';
 import OCForm from '../components/Form';
 import OCFormInput from '../components/FormInput';
 import OCButton from '../components/Button';
-import supabase from './api/supabase';
+import supabase, { createFriend, createGroup } from './api/supabase';
+import groupValidationSchema from '../validations/group.validation';
+import { GroupModel } from '../models/group.model';
 
 const defaultValues = {
+  group_name: '',
   name: '',
   email: '',
   access_token: '',
@@ -22,19 +24,34 @@ export default function Home() {
     handleSubmit,
   } = useForm({
     defaultValues,
-    resolver: yupResolver(friendValidationSchema),
+    resolver: yupResolver(groupValidationSchema),
   });
 
   const onSubmit = async (data: any) => {
-    const response = await supabase.from('friends').insert(data).select();
+    const group = await createGroup({ name: data.group_name });
 
-    console.log(response);
+    if (group && group[0].id) {
+      const friend = await createFriend({
+        name: data.name,
+        email: data.email,
+        access_token: data.access_token,
+        group: group[0].id,
+      });
+
+      console.log(group, friend);
+    }
   };
 
   //console.log(errors);
 
   return (
     <OCForm onSubmit={handleSubmit(onSubmit)}>
+      <OCFormInput
+        name="group_name"
+        label="Nome do grupo"
+        errors={errors}
+        control={control}
+      />
       <OCFormInput
         name="name"
         label="Seu nome"
