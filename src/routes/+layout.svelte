@@ -3,9 +3,21 @@
 	import PageTransition from '$lib/components/PageTransition/PageTransition.svelte';
 	import '../app.scss';
 	import { page } from '$app/stores';
-	import { preparePageTransition } from '$lib/components/PageTransition/page-transition';
+	import { supabase } from '$lib/db/db';
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
 
-	preparePageTransition();
+	onMount(() => {
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange(() => {
+			invalidate('supabase:auth');
+		});
+
+		return () => {
+			subscription.unsubscribe();
+		};
+	});
 </script>
 
 <PageTransition refresh={$page.url.pathname}>
