@@ -1,1 +1,15 @@
 /* Variables and mixins declared here will be available in all other SCSS files */
+$foreground-medium: #d97706;
+$foreground-dark: #78350f;
+
+$background-white: #ffffff;
+$background-light: #fff7ed;
+
+$accent-click: #1d4ed8;
+$accent-background: #fcd34d;
+$accent-title: $foreground-dark;
+$accent-error: #b91c1c;
+
+$font-body: 'Inter', 'Helvetica', sans-serif;
+$font-head: 'Archivo', 'Trebuchet', sans-serif;
+$font-click: 'Barlow', sans-serif;

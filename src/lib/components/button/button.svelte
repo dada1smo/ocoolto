@@ -1,27 +1,46 @@
 <script>
 	export let label = 'Teste';
+
+	/**
+	 * @type {"button" | "submit" | "reset" | null | undefined}
+	 */
+	export let type = 'button';
+	export let isLink = false;
+	export let sendTo = '';
 </script>
 
-<button>{label}</button>
+{#if !isLink}
+	<button class="button" {type} on:click>{label}</button>
+{:else}
+	<a class="button" href={sendTo}>{label}</a>
+{/if}
 
 <style lang="scss">
-	button {
+	.button {
 		outline: none;
-		border: none;
+		border: unset;
 		font-size: 16px;
-		line-height: 28px;
-		font-weight: 500;
+		line-height: 20px;
+		font-weight: 600;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
-		padding: 12px 40px;
-		border-radius: 4444px;
+		padding: 10px 14px 10px;
 		cursor: pointer;
 		transition: 0.3s;
+		color: $foreground-dark;
+		border: 1px solid $foreground-medium;
+		font-family: $font-head;
+		color: $accent-click;
 
 		&:hover {
-			background: #333333;
+			box-shadow: -4px -4px 0px $foreground-medium;
+			transform: translate(4px, 4px);
 		}
+	}
+
+	a {
+		text-decoration: none;
 	}
 </style>
