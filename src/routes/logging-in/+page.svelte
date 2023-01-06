@@ -7,7 +7,7 @@
 
 		// check if user has been set in session store then redirect
 		if ($page.data.session) {
-			goto(redirectTo ?? '/dashboard');
+			goto(redirectTo ?? '/private');
 		}
 	}
 </script>

@@ -58,7 +58,8 @@ export const actions = {
 
 		return {
 			success: true,
-			message: 'Please check your email for a magic link to log into the website.'
+			message:
+				'Enviamos para seu e-mail um link mágico para acessar o site. Você pode fechar essa página.'
 		};
 	}
 };

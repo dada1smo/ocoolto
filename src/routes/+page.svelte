@@ -2,49 +2,62 @@
 	import { applyAction, enhance } from '$app/forms';
 	import Button from '$lib/components/Button/Button.svelte';
 	import Input from '$lib/components/Form/Input/Input.svelte';
-	import groupValidationSchema from '$lib/validation/group.validation';
 	import { page } from '$app/stores';
+	import Form from '$lib/components/Form/Form.svelte';
+	import userValidationSchema from '$lib/validation/user.validation';
+	import Notification from '$lib/components/Notification/notification.svelte';
 
 	let values = {};
 	let errors = {};
 
-	export let data;
+	let data;
 	let loading = false;
 	export let form;
 
-	// async function handleSubmit(data, cancel) {
-	// 	const formValues = Object.fromEntries(data.entries());
-	// 	console.log(values);
-	// 	try {
-	// 		await groupValidationSchema.validate(formValues, { abortEarly: false });
-	// 		errors = {};
-	// 	} catch (err) {
-	// 		console.log('erros');
-	// 		cancel();
-	// 		errors = err.inner.reduce((acc, err) => {
-	// 			return { ...acc, [err.path]: err.message };
-	// 		}, {});
-	// 		console.log(errors);
-	// 	}
-	// }
-
-	const handleSubmit = () => {
+	async function handleSubmit(data, cancel) {
 		loading = true;
+		const formValues = Object.fromEntries(data.entries());
+		try {
+			await userValidationSchema.validate(formValues, { abortEarly: false });
+			errors = {};
+		} catch (err) {
+			cancel();
+			errors = err.inner.reduce((acc, err) => {
+				return { ...acc, [err.path]: err.message };
+			}, {});
+		}
+
 		return async ({ result }) => {
 			loading = false;
 			await applyAction(result);
 		};
-	};
+	}
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<div class="content">
+	<h1>Cansado de malabarismo pra sortear amigo oculto?</h1>
+	<p>Let's make amigo oculto cool again.</p>
 
-{#if form?.message}
-	<div>{form.message}</div>
-{/if}
+	{#if form?.message}
+		<Notification message={form?.message} />
+	{:else}
+		<div class="form">
+			<Form method="POST" handleSubmit={({ data, cancel }) => handleSubmit(data, cancel)}>
+				<Input
+					type="email"
+					name="email"
+					label="Seu e-mail"
+					placeholder="exemplo@exemplo.com"
+					error={errors.email}
+					value={form?.values?.email ?? ''}
+				/>
+				<Button label="Entrar" type="submit" />
+			</Form>
+		</div>
+	{/if}
+</div>
 
-<form method="POST" use:enhance={handleSubmit}>
+<!-- <form method="POST" use:enhance={handleSubmit}>
 	<div>
 		<label for="email">Email</label>
 		<input
@@ -59,7 +72,7 @@
 	<div>
 		<button disabled={loading}>Login</button>
 	</div>
-</form>
+</form> -->
 
 <!-- <form
 	method="POST"
@@ -96,3 +109,13 @@
 {#if form?.success}
 	<p>Successfully logged in! Welcome back</p>
 {/if} -->
+<style>
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.form {
+		margin-top: 12px;
+	}
+</style>
