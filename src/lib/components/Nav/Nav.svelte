@@ -5,12 +5,10 @@
 	export let showType = false;
 
 	function hoverType() {
-		console.log('entrei');
 		showType = true;
 	}
 
 	function leaveType() {
-		console.log('sai');
 		showType = false;
 	}
 </script>

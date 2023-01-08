@@ -12,3 +12,5 @@ export const load = async (event) => {
 		user: session.user
 	};
 };
+
+// https://github.com/supabase/auth-helpers/blob/main/packages/sveltekit/README.md
