@@ -3,9 +3,10 @@
 
 	export let method = '';
 	export let handleSubmit;
+	export let action;
 </script>
 
-<form {method} novalidate use:enhance={handleSubmit}>
+<form {method} novalidate use:enhance={handleSubmit} {action}>
 	<slot />
 </form>
 

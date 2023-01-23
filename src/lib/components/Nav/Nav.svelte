@@ -15,7 +15,7 @@
 
 <nav>
 	<div class="logo" on:mouseenter={hoverType} on:mouseleave={leaveType}>
-		<Logo {showType} />
+		<Logo {showType} color="#1d4ed8" />
 	</div>
 	<Button label="Sair" />
 </nav>

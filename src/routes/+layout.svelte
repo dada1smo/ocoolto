@@ -6,7 +6,6 @@
 	import { supabase } from '$lib/db/db';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { userEmail } from '$lib/stores/stores';
 
 	onMount(() => {
 		const {

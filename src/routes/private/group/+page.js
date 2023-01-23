@@ -1,10 +1,16 @@
-import { userEmail } from '$lib/stores/stores';
-import { get } from 'svelte/store';
+import { getSupabase } from '@supabase/auth-helpers-sveltekit';
+import { redirect } from '@sveltejs/kit';
 
-// export const load = () => {
-// 	let email = get(userEmail);
+export const load = async (event) => {
+	const { session, supabaseClient } = await getSupabase(event);
+	if (!session) {
+		throw redirect(303, '/');
+	}
 
-// 	return {
-// 		userEmail: email
-// 	};
-// };
+	const { data: tableData } = await supabaseClient.from('test').select('*');
+
+	return {
+		user: session.user,
+		tableData
+	};
+};

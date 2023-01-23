@@ -46,14 +46,14 @@
 		width: 100%;
 		background: $background-light;
 		height: 40px;
-		border-bottom: 1px solid $foreground-medium;
+		border: 1px solid $foreground-medium;
 		transition: 0.2s;
 		padding: 4px 8px;
 
 		&:focus,
 		&:focus-visible {
 			outline: none;
-			border-bottom: 1px solid $accent-click;
+			border: 1px solid $accent-click;
 		}
 	}
 
