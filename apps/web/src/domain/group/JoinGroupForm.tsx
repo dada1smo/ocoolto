@@ -9,10 +9,11 @@ export function JoinGroupForm({ groupId, drawn }: { groupId: string; drawn: bool
   if (sentTo) return <CheckEmail email={sentTo} onBack={() => setSentTo(undefined)} />
   return (
     <PersonForm
+      withTurnstile
       submitLabel={drawn ? 'Receber link de acesso' : 'Entrar no grupo'}
       emailCaption={drawn ? 'Use o mesmo e-mail com que você entrou.' : 'Enviamos um link de acesso. Sem senha.'}
       onSubmit={async (f) => {
-        await joinGroup(groupId, { name: f.name, email: f.email })
+        await joinGroup(groupId, { name: f.name, email: f.email, turnstile: f.turnstile })
         setSentTo(f.email)
         return true
       }}

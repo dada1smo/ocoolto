@@ -31,9 +31,9 @@ export function useGroup(id: string) {
   return { group, error, reload }
 }
 
-export const createGroup = (json: { groupName: string; name: string; email: string }) =>
+export const createGroup = (json: { groupName: string; name: string; email: string; turnstile: string }) =>
   request(api.groups.$post({ json }))
-export const joinGroup = (id: string, json: { name: string; email: string }) =>
+export const joinGroup = (id: string, json: { name: string; email: string; turnstile: string }) =>
   request(api.groups[':id'].join.$post({ param: { id }, json }))
 export const addParticipant = (id: string, json: { name: string; email: string }) =>
   request(api.groups[':id'].participants.$post({ param: { id }, json }))

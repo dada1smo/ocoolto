@@ -14,7 +14,7 @@ export function CheckEmail({ email, onBack }: { email: string; onBack: () => voi
         {import.meta.env.DEV && ' (Em dev, o link aparece no console do wrangler.)'}
       </Blankslate.Description>
       {/* SecondaryAction only renders links, so a plain invisible Button */}
-      <Button variant="invisible" onClick={onBack}>
+      <Button variant="invisible" onClick={onBack} className="mt-4">
         Usar outro e-mail
       </Button>
     </Blankslate>

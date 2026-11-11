@@ -6,18 +6,22 @@ import { useMyGroups } from '../../domain/group/useMyGroups'
 import { requestLink } from '../../global/auth'
 import { useAction } from '../../global/useAction'
 import { Section } from '../../ui/Section'
+import { Turnstile } from '../../ui/Turnstile'
 
 function FindGroups() {
   const [sentTo, setSentTo] = useState<string>()
-  const { run, pending, error } = useAction(async (email: string) => {
-    await requestLink(email)
+  const [challenge, setChallenge] = useState(0) // a Turnstile token is single-use: remount for a new one
+  const { run, pending, error } = useAction(async (email: string, turnstile: string) => {
+    await requestLink(email, turnstile)
     setSentTo(email)
   })
   if (sentTo) return <CheckEmail email={sentTo} onBack={() => setSentTo(undefined)} />
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    run(new FormData(e.currentTarget).get('email') as string)
+    const data = new FormData(e.currentTarget)
+    await run(data.get('email') as string, (data.get('cf-turnstile-response') as string) ?? '')
+    setChallenge((n) => n + 1)
   }
   return (
     <form onSubmit={submit}>
@@ -29,6 +33,7 @@ function FindGroups() {
             Use o e-mail com que você entrou nos grupos. Se ele tiver grupos, enviamos um link de acesso.
           </FormControl.Caption>
         </FormControl>
+        <Turnstile key={challenge} />
         {error && <Banner variant="critical" title="Erro" hideTitle description={error} />}
         <Button type="submit" variant="primary" size="large" block loading={pending}>
           Receber link de acesso

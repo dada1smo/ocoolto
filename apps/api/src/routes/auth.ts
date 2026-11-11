@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { sendMagicLink } from '../lib/email'
+import { guard, isFull } from '../lib/guard'
 import { sha256, startSession, type AppEnv } from '../lib/session'
 import { groupsOf } from './me'
 
@@ -9,11 +10,17 @@ type Token = { email: string; name: string | null; group_id: string | null }
 
 export const auth = new Hono<AppEnv>()
   // "find my groups": same answer whether or not the email has groups, so it can't be used to probe emails
-  .post('/request', zValidator('json', z.object({ email: z.email().trim().toLowerCase() })), async (c) => {
-    const { email } = c.req.valid('json')
-    if ((await groupsOf(c.env.DB, email)).length > 0) await sendMagicLink(c, { email })
-    return c.json({ ok: true })
-  })
+  .post(
+    '/request',
+    zValidator('json', z.object({ email: z.email().trim().toLowerCase(), turnstile: z.string().min(1) })),
+    async (c) => {
+      const { email, turnstile } = c.req.valid('json')
+      const blocked = await guard(c, turnstile)
+      if (blocked) return blocked
+      if ((await groupsOf(c.env.DB, email)).length > 0) await sendMagicLink(c, { email })
+      return c.json({ ok: true })
+    },
+  )
 
   .post('/', zValidator('json', z.object({ token: z.string().min(1) })), async (c) => {
     const db = c.env.DB
@@ -37,6 +44,8 @@ export const auth = new Hono<AppEnv>()
       .first<{ drawn_at: number | null }>()
     if (!group) return c.json({ error: 'not_found' }, 404)
     if (group.drawn_at === null) {
+      // shortcut: count-then-insert can overshoot 50 by a racing request, fine for a friends app
+      if (await isFull(db, tok.group_id)) return c.json({ error: 'full' }, 409)
       await db
         .prepare(
           'INSERT INTO participants (id, group_id, email, name) VALUES (?, ?, ?, ?) ON CONFLICT (group_id, email) DO UPDATE SET name = excluded.name',

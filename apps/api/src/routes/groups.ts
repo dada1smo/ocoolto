@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { draw } from '../lib/draw'
 import { sendMagicLink } from '../lib/email'
+import { guard, isFull } from '../lib/guard'
 import type { AppEnv } from '../lib/session'
 
 type Group = { id: string; name: string; owner_email: string; drawn_at: number | null }
@@ -18,7 +19,7 @@ type Participant = {
 const person = z.object({
   name: z.string().trim().min(1).max(60),
   email: z.email().trim().toLowerCase(),
-  turnstile: z.string().optional(), // verified in phase 4
+  turnstile: z.string().min(1),
 })
 
 const getGroup = (db: D1Database, id: string) =>
@@ -26,7 +27,9 @@ const getGroup = (db: D1Database, id: string) =>
 
 export const groups = new Hono<AppEnv>()
   .post('/', zValidator('json', person.extend({ groupName: z.string().trim().min(1).max(80) })), async (c) => {
-    const { groupName, name, email } = c.req.valid('json')
+    const { groupName, name, email, turnstile } = c.req.valid('json')
+    const blocked = await guard(c, turnstile)
+    if (blocked) return blocked
     const id = crypto.randomUUID()
     await c.env.DB.prepare('INSERT INTO groups (id, name, owner_email, created_at) VALUES (?, ?, ?, ?)')
       .bind(id, groupName, email, Date.now())
@@ -93,7 +96,10 @@ export const groups = new Hono<AppEnv>()
   .post('/:id/join', zValidator('json', person), async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)
-    const { name, email } = c.req.valid('json')
+    const { name, email, turnstile } = c.req.valid('json')
+    const blocked = await guard(c, turnstile)
+    if (blocked) return blocked
+    if (await isFull(c.env.DB, group.id)) return c.json({ error: 'full' }, 409)
     // after the draw only existing participants may log in again
     if (group.drawn_at !== null) {
       const known = await c.env.DB.prepare('SELECT 1 FROM participants WHERE group_id = ? AND email = ?')
@@ -105,11 +111,12 @@ export const groups = new Hono<AppEnv>()
     return c.json({ ok: true })
   })
 
-  .post('/:id/participants', zValidator('json', person), async (c) => {
+  .post('/:id/participants', zValidator('json', person.omit({ turnstile: true })), async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)
     if (c.get('email') !== group.owner_email) return c.json({ error: 'forbidden' }, 403)
     if (group.drawn_at !== null) return c.json({ error: 'already_drawn' }, 409)
+    if (await isFull(c.env.DB, group.id)) return c.json({ error: 'full' }, 409)
     const { name, email } = c.req.valid('json')
     // no email is sent: the person logs in later through the invite link with this same email
     const { meta } = await c.env.DB.prepare(

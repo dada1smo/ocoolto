@@ -4,5 +4,7 @@
     "lib": ["ES2022"],
     "types": ["./worker-configuration.d.ts"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  // uses node:sqlite/node:fs; vitest typechecks it at runtime, not worth adding @types/node
+  "exclude": ["src/limits.test.ts"]
 }

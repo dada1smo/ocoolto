@@ -3,7 +3,8 @@ import type { AppEnv } from './session'
 import { sha256 } from './session'
 
 const TOKEN_MS = 15 * 60 * 1000
-const LIMIT = 3 // emails per address per hour
+const MIN = 60 * 1000
+const DAY = 24 * 60 * MIN
 
 /** Creates a single-use login token and emails the magic link. Without a group the link only logs in. */
 export async function sendMagicLink(
@@ -11,13 +12,18 @@ export async function sendMagicLink(
   to: { email: string; name?: string },
   group?: { id: string; name: string },
 ) {
-  // over the limit: skip silently, so the response never reveals anything about the address
-  const since = Date.now() - 60 * 60 * 1000
-  const sent = await c.env.DB.prepare('SELECT COUNT(*) AS n FROM email_log WHERE email = ? AND sent_at > ?')
-    .bind(to.email, since)
-    .first<{ n: number }>()
-  if (sent!.n >= LIMIT && c.env.ENV !== 'dev') return
-  await c.env.DB.prepare('INSERT INTO email_log (email, sent_at) VALUES (?, ?)').bind(to.email, Date.now()).run()
+  // over a limit: skip silently, so the response never reveals anything about the address
+  const now = Date.now()
+  const count = (where: string, ...args: unknown[]) =>
+    c.env.DB.prepare(`SELECT COUNT(*) AS n FROM email_log WHERE ${where}`)
+      .bind(...args)
+      .first<{ n: number }>()
+      .then((r) => r!.n)
+  if ((await count('email = ? AND sent_at > ?', to.email, now - 2 * MIN)) >= 1) return
+  if ((await count('email = ? AND sent_at > ?', to.email, now - DAY)) >= 5) return
+  // Resend's free plan allows 100/day; GLOBAL_EMAIL_LIMIT lets tests lower the cap
+  if ((await count('sent_at > ?', now - DAY)) >= Number(c.env.GLOBAL_EMAIL_LIMIT)) return
+  await c.env.DB.prepare('INSERT INTO email_log (email, sent_at) VALUES (?, ?)').bind(to.email, now).run()
 
   const token = crypto.randomUUID()
   await c.env.DB.prepare('INSERT INTO login_tokens (hash, email, name, group_id, expires_at) VALUES (?, ?, ?, ?, ?)')

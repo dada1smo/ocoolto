@@ -9,10 +9,11 @@ export function CreateGroupForm() {
   return (
     <PersonForm
       withGroupName
+      withTurnstile
       submitLabel="Criar grupo"
-      emailCaption="Enviamos um link de acesso. Sem senha."
+      emailCaption="Enviaremos um link de acesso. Sem senha."
       onSubmit={async (f) => {
-        await createGroup({ groupName: f.groupName, name: f.name, email: f.email })
+        await createGroup({ groupName: f.groupName, name: f.name, email: f.email, turnstile: f.turnstile })
         setSentTo(f.email)
         return true
       }}

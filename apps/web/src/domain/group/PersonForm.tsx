@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Banner, Button, FormControl, Stack, TextInput } from '@primer/react'
 import { useAction } from '../../global/useAction'
+import { Turnstile } from '../../ui/Turnstile'
 
-type Fields = { name: string; email: string; groupName: string }
+type Fields = { name: string; email: string; groupName: string; turnstile: string }
 type Errors = Partial<Record<keyof Fields, string>>
 
 function validate(f: Fields, withGroup: boolean): Errors {
@@ -19,25 +20,31 @@ export function PersonForm({
   submitLabel,
   onSubmit,
   withGroupName = false,
+  withTurnstile = false,
   emailCaption,
 }: {
   submitLabel: string
   onSubmit: (fields: Fields) => Promise<unknown>
   withGroupName?: boolean
+  withTurnstile?: boolean
   emailCaption?: string
 }) {
   const { run, pending, error } = useAction(onSubmit)
   const [errors, setErrors] = useState<Errors>({})
+  const [challenge, setChallenge] = useState(0) // a Turnstile token is single-use: remount for a new one
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
-    const fields = { groupName: '', ...Object.fromEntries(new FormData(form)) } as Fields
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>
+    const fields = { groupName: '', ...data, turnstile: data['cf-turnstile-response'] ?? '' } as Fields
     const found = validate(fields, withGroupName)
     setErrors(found)
     const first = Object.keys(found)[0]
     if (first) return (form.elements.namedItem(first) as HTMLInputElement).focus()
-    if ((await run(fields)) !== undefined) form.reset()
+    const result = await run(fields)
+    if (result !== undefined) form.reset()
+    setChallenge((n) => n + 1)
   }
   // once a field was flagged, clear its message as soon as the user edits it
   const clear = (e: FormEvent<HTMLFormElement>) => {
@@ -60,9 +67,11 @@ export function PersonForm({
   return (
     <form onSubmit={submit} onChange={clear} noValidate>
       <Stack gap="normal">
-        {withGroupName && field('groupName', 'Nome do grupo', { maxLength: 80, placeholder: 'Amigo oculto da família' })}
+        {withGroupName &&
+          field('groupName', 'Nome do grupo', { maxLength: 80, placeholder: 'Amigo oculto da família' })}
         {field('name', 'Nome', { maxLength: 60, autoComplete: 'name' })}
         {field('email', 'E-mail', { type: 'email', autoComplete: 'email' }, emailCaption)}
+        {withTurnstile && <Turnstile key={challenge} />}
         {error && <Banner variant="critical" title="Erro" hideTitle description={error} />}
         <Button type="submit" variant="primary" size="large" block loading={pending}>
           {submitLabel}
