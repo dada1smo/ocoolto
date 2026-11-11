@@ -8,6 +8,7 @@ import { JoinGroupForm } from '../../domain/group/JoinGroupForm'
 import { ParticipantList } from '../../domain/group/ParticipantList'
 import { TargetCard } from '../../domain/group/TargetCard'
 import { inviteText, useGroup } from '../../domain/group/useGroup'
+import { WishesForm } from '../../domain/group/WishesForm'
 import { CopyButton } from '../../ui/CopyButton'
 import { Section } from '../../ui/Section'
 
@@ -69,6 +70,7 @@ export default function GroupPage() {
       ) : (
         <>
           <TargetCard name={group.target?.name ?? null} />
+          <WishesForm groupId={id} group={group} onChange={reload} />
           {group.isOwner && (
             <AdminPanel groupId={id} group={group} showPairs={showPairs} onShowPairs={setShowPairs} onChange={reload} />
           )}

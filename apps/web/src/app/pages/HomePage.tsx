@@ -21,7 +21,7 @@ export default function HomePage() {
         </span>
         <h1 style={{ font: 'var(--text-title-shorthand-large)' }}>Amigo oculto, sem complicação</h1>
         <p className="max-w-md" style={{ color: 'var(--fgColor-muted)' }}>
-          Sem cadastro, sem senha e sem papelzinho. Funciona no celular.
+          Sem cadastro, sem senha e sem papelzinho.
         </p>
       </div>
 

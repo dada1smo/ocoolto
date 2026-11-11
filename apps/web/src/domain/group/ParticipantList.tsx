@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Button, Dialog, IconButton, Label } from '@primer/react'
 import { Blankslate } from '@primer/react/experimental'
-import { ArrowRightIcon, PeopleIcon, PersonAddIcon, TrashIcon } from '@primer/octicons-react'
+import { ArrowRightIcon, GiftIcon, PeopleIcon, PersonAddIcon, TrashIcon } from '@primer/octicons-react'
 import { ConfirmAction } from '../../ui/ConfirmAction'
 import { CopyButton } from '../../ui/CopyButton'
 import { Section } from '../../ui/Section'
 import { PersonForm } from './PersonForm'
+import { formatEditedAt } from './WishesForm'
 import { addParticipant, inviteText, removeParticipant, type MemberView, type Participant } from './useGroup'
 
 const initials = (name: string) =>
@@ -29,6 +30,7 @@ export function ParticipantList({
 }) {
   const [adding, setAdding] = useState(false)
   const [removing, setRemoving] = useState<Participant>()
+  const [viewing, setViewing] = useState<Participant>()
   const editable = group.isOwner && !group.drawn
   const onlyOwner = group.participants.length === 1
 
@@ -65,6 +67,16 @@ export function ParticipantList({
                 </span>
               )}
             </div>
+            {p.wishes && (
+              <Button
+                size="medium"
+                leadingVisual={GiftIcon}
+                aria-label={`Ver lista de desejos de ${p.name}`}
+                onClick={() => setViewing(p)}
+              >
+                Lista de desejos
+              </Button>
+            )}
             {showPairs && p.targetName && (
               <span className="flex items-center gap-1 font-semibold">
                 <span style={{ color: 'var(--fgColor-muted)' }}>
@@ -94,12 +106,7 @@ export function ParticipantList({
           <Blankslate.Description>
             Copie o convite e mande no grupo da família ou dos amigos. Cada pessoa entra com o próprio e-mail.
           </Blankslate.Description>
-          <CopyButton
-            variant="primary"
-            label="Copiar convite"
-            value={inviteText(groupId, group)}
-            className="mt-4"
-          />
+          <CopyButton variant="primary" label="Copiar convite" value={inviteText(groupId, group)} className="mt-4" />
         </Blankslate>
       )}
 
@@ -118,6 +125,17 @@ export function ParticipantList({
               return true
             }}
           />
+        </Dialog>
+      )}
+
+      {viewing?.wishes && (
+        <Dialog
+          title={`Lista de desejos de ${viewing.name}`}
+          subtitle={viewing.wishesAt && `Editado em ${formatEditedAt(viewing.wishesAt)}`}
+          width="large"
+          onClose={() => setViewing(undefined)}
+        >
+          <p className="whitespace-pre-wrap wrap-break-word">{viewing.wishes}</p>
         </Dialog>
       )}
 

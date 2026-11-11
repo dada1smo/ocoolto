@@ -6,6 +6,8 @@ export const api = hc<AppType>('/').api
 const messages: Record<string, string> = {
   not_found: 'Não encontrado.',
   forbidden: 'Só o organizador pode fazer isso.',
+  not_member: 'Você não participa deste grupo.',
+  unauthorized: 'Entre no grupo para continuar.',
   already_drawn: 'O sorteio deste grupo já foi feito.',
   already_in: 'Essa pessoa já está no grupo.',
   too_few: 'O sorteio precisa de pelo menos 3 pessoas.',

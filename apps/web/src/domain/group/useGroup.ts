@@ -39,5 +39,7 @@ export const addParticipant = (id: string, json: { name: string; email: string }
   request(api.groups[':id'].participants.$post({ param: { id }, json }))
 export const removeParticipant = (id: string, pid: string) =>
   request(api.groups[':id'].participants[':pid'].$delete({ param: { id, pid } }))
+export const saveWishes = (id: string, json: { wishes: string }) =>
+  request(api.groups[':id'].me.wishes.$put({ param: { id }, json }))
 export const drawGroup = (id: string) => request(api.groups[':id'].draw.$post({ param: { id } }))
 export const undrawGroup = (id: string) => request(api.groups[':id'].draw.$delete({ param: { id } }))
