@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { ActionList, ActionMenu, IconButton } from '@primer/react'
+import { ActionList, ActionMenu, Button, IconButton } from '@primer/react'
 import { GiftIcon, PeopleIcon, PersonIcon, SignOutIcon } from '@primer/octicons-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useMyGroups } from '../domain/group/useMyGroups'
@@ -37,6 +37,11 @@ export function Page({ children }: { children: ReactNode }) {
           </Link>
           <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
+            {!loggedIn && (
+              <Button as={Link} to="/entrar" variant="invisible">
+                Entrar
+              </Button>
+            )}
             {loggedIn && (
               <ActionMenu>
                 <ActionMenu.Anchor>
@@ -66,12 +71,6 @@ export function Page({ children }: { children: ReactNode }) {
       <main className={`${container} flex flex-1 flex-col gap-6 py-8`}>{children}</main>
       <footer className={`${container} py-6 text-sm`} style={{ color: 'var(--fgColor-muted)' }}>
         ocoolto · amigo oculto pra lá de legal
-        {!loggedIn && (
-          <>
-            {' · '}
-            <Link to="/meus-grupos">Encontrar meus grupos</Link>
-          </>
-        )}
       </footer>
     </div>
   )

@@ -10,7 +10,7 @@ export function GroupView({ groupId, group, onChange }: { groupId: string; group
       {group.member ? (
         <MemberTabs groupId={groupId} group={group} onChange={onChange} />
       ) : (
-        <VisitorView groupId={groupId} group={group} onChange={onChange} />
+        <VisitorView groupId={groupId} group={group} />
       )}
     </>
   )

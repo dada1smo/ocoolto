@@ -3,7 +3,7 @@ import { Banner, Button, FormControl, IconButton, Textarea, TextInput } from '@p
 import { CalendarIcon, PencilIcon } from '@primer/octicons-react'
 import { useAction } from '../../global/useAction'
 import { Section } from '../../ui/Section'
-import { updateGroup, type GroupData } from './useGroup'
+import { updateGroup, type MemberView } from './useGroup'
 
 // date-only value: render in UTC so the day never shifts with the viewer's timezone
 const formatDate = (iso: string) =>
@@ -15,7 +15,7 @@ const formatDate = (iso: string) =>
     timeZone: 'UTC',
   })
 
-/** Optional event date + description: visible to everyone, editable only by the owner (Primer Edit/Saving patterns). */
+/** Optional event date + description: visible to members, editable only by the owner (Primer Edit/Saving patterns). */
 export function GroupDetails({
   groupId,
   group,
@@ -23,7 +23,7 @@ export function GroupDetails({
   onChange,
 }: {
   groupId: string
-  group: GroupData
+  group: MemberView
   canEdit: boolean
   onChange: () => unknown
 }) {

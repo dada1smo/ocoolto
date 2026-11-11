@@ -53,13 +53,7 @@ export const groups = new Hono<AppEnv>()
   .get('/:id', async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)
-    const base = {
-      name: group.name,
-      drawn: group.drawn_at !== null,
-      drawnAt: group.drawn_at,
-      eventDate: group.event_date,
-      description: group.description,
-    }
+    const base = { name: group.name, drawn: group.drawn_at !== null }
     // `member` discriminates the two views (otherwise TS collapses the union to the smaller one)
     const anon = { ...base, member: false as const }
     const email = c.get('email')
@@ -79,6 +73,9 @@ export const groups = new Hono<AppEnv>()
     const target = nameOf(me?.target_id ?? null)
     return c.json({
       ...base,
+      drawnAt: group.drawn_at,
+      eventDate: group.event_date,
+      description: group.description,
       member: true as const,
       isOwner,
       isRoot: root,

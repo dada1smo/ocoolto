@@ -18,7 +18,12 @@ export function EditableTitle({
   onChange: () => unknown
 }) {
   const { run, pending, error } = useAction((name: string) =>
-    updateGroup(groupId, { name, eventDate: group.eventDate ?? '', description: group.description ?? '' }),
+    // only members (the owner) can edit; visitors never reach this
+    updateGroup(groupId, {
+      name,
+      eventDate: (group.member && group.eventDate) || '',
+      description: (group.member && group.description) || '',
+    }),
   )
   const [editing, setEditing] = useState(false)
   const input = useRef<HTMLInputElement>(null)
