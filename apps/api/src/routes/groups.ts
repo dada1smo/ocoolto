@@ -109,6 +109,19 @@ export const groups = new Hono<AppEnv>()
     return c.json({ ok: true })
   })
 
+  .delete('/:id/draw', async (c) => {
+    const group = await getGroup(c.env.DB, c.req.param('id'))
+    if (!group) return c.json({ error: 'not_found' }, 404)
+    if (c.get('email') !== group.owner_email) return c.json({ error: 'forbidden' }, 403)
+    if (group.drawn_at === null) return c.json({ error: 'not_drawn' }, 409)
+    const db = c.env.DB
+    await db.batch([
+      db.prepare('UPDATE participants SET target_id = NULL WHERE group_id = ?').bind(group.id),
+      db.prepare('UPDATE groups SET drawn_at = NULL WHERE id = ?').bind(group.id),
+    ])
+    return c.json({ ok: true })
+  })
+
   .delete('/:id/participants/:pid', async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)

@@ -38,3 +38,4 @@ export const addParticipant = (id: string, json: { name: string; email: string }
 export const removeParticipant = (id: string, pid: string) =>
   request(api.groups[':id'].participants[':pid'].$delete({ param: { id, pid } }))
 export const drawGroup = (id: string) => request(api.groups[':id'].draw.$post({ param: { id } }))
+export const undrawGroup = (id: string) => request(api.groups[':id'].draw.$delete({ param: { id } }))

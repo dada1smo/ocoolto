@@ -1,9 +1,9 @@
 import { useId, useState } from 'react'
 import { Banner, Button, ToggleSwitch } from '@primer/react'
-import { SyncIcon } from '@primer/octicons-react'
+import { SyncIcon, UndoIcon } from '@primer/octicons-react'
 import { ConfirmAction } from '../../ui/ConfirmAction'
 import { Section } from '../../ui/Section'
-import { drawGroup, type MemberView } from './useGroup'
+import { drawGroup, undrawGroup, type MemberView } from './useGroup'
 
 const MIN = 3
 
@@ -22,6 +22,7 @@ export function AdminPanel({
   onChange: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
+  const [undoing, setUndoing] = useState(false)
   const [tooFew, setTooFew] = useState(false)
   const toggleLabel = useId()
   const toggleCaption = useId()
@@ -46,13 +47,30 @@ export function AdminPanel({
             onClick={() => onShowPairs(!showPairs)}
           />
         </div>
+        <Button leadingVisual={UndoIcon} onClick={() => setUndoing(true)}>
+          Desfazer sorteio
+        </Button>
+        {undoing && (
+          <ConfirmAction
+            title="Desfazer o sorteio?"
+            confirmLabel="Desfazer sorteio"
+            onConfirm={async () => {
+              await undrawGroup(groupId)
+              onShowPairs(false)
+              onChange()
+            }}
+            onClose={() => setUndoing(false)}
+          >
+            Todos os amigos ocultos atuais somem. O grupo volta a aceitar gente e você pode sortear de novo.
+          </ConfirmAction>
+        )}
       </Section>
     )
 
   return (
     <Section title="Sorteio">
       <p style={{ color: 'var(--fgColor-muted)' }}>
-        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra e não dá para refazer.
+        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra, a menos que você desfaça o sorteio.
       </p>
       {tooFew && count < MIN && (
         <Banner
@@ -82,7 +100,7 @@ export function AdminPanel({
           }}
           onClose={() => setConfirming(false)}
         >
-          Depois do sorteio não dá para desfazer nem entrar gente nova. Cada pessoa vê só quem tirou.
+          Depois do sorteio não entra gente nova, a menos que você desfaça. Cada pessoa vê só quem tirou.
         </ConfirmAction>
       )}
     </Section>

@@ -83,6 +83,7 @@ O organizador é identificado por `owner_email`. Tokens e IDs vêm de `crypto.ra
 | `POST /api/auth` | quem tem o link | `{token}` → valida, cria ou atualiza o participante, cria a sessão (cookie) → `{groupId}` |
 | `POST /api/groups/:id/participants` | dono | `{name, email}` → adiciona a pessoa sem mandar e-mail (ela entra depois pelo link de convite com o mesmo e-mail). Só antes do sorteio |
 | `POST /api/groups/:id/draw` | dono | com 3 ou mais pessoas e ainda não sorteado → grava `target_id` de todos num `db.batch` |
+| `DELETE /api/groups/:id/draw` | dono | só se já sorteado → zera `target_id` de todos e `drawn_at`; o grupo volta ao estado sem sorteio (ilimitado) |
 | `DELETE /api/groups/:id/participants/:pid` | dono | só antes do sorteio |
 
 Notas:
@@ -187,7 +188,7 @@ Como rodar:
 ---
 
 ## Fora de escopo (dá para adicionar depois sem mudar o schema)
-E-mail avisando que o sorteio saiu (gastaria cota), restrições do tipo "casal não tira casal", lista de desejos, sortear de novo, painel "meus grupos".
+E-mail avisando que o sorteio saiu (gastaria cota), restrições do tipo "casal não tira casal", lista de desejos, painel "meus grupos".
 
 ## Limitações conhecidas
 - Quem tem o link do grupo consegue entrar. O dono vê a lista e remove.
