@@ -11,14 +11,18 @@
   },
   "d1_databases": [
     // database_id is filled in phase 5 (wrangler d1 create ocoolto); local dev ignores it
-    { "binding": "DB", "database_name": "ocoolto", "database_id": "local" }
+    { "binding": "DB", "database_name": "ocoolto", "database_id": "c1f8b4ee-c3c8-46f8-9616-da7a2c19def8" }
   ],
   "ratelimits": [
     // per-IP limit on endpoints that send email: 5 per minute
     { "name": "IP_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
   ],
+  "routes": [
+    { "pattern": "ocoolto.com.br", "custom_domain": true },
+    { "pattern": "www.ocoolto.com.br", "custom_domain": true }
+  ],
   "vars": {
-    "EMAIL_FROM": "ocoolto <nao-responda@ocoolto.com>",
+    "EMAIL_FROM": "ocoolto <nao-responda@ocoolto.com.br>",
     "GLOBAL_EMAIL_LIMIT": "90"
   }
   // .dev.vars sets ENV=dev locally (magic link goes to the console) and Cloudflare's test Turnstile secret
