@@ -12,3 +12,10 @@
 body {
   background: var(--bgColor-inset);
 }
+
+/* iOS Safari zooms into fields with font-size < 16px; Primer sets size via class, hence !important */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}

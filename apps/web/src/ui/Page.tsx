@@ -33,7 +33,7 @@ export function Page({ children }: { children: ReactNode }) {
       </header>
       <main className={`${container} flex flex-1 flex-col gap-6 py-8`}>{children}</main>
       <footer className={`${container} py-6 text-sm`} style={{ color: 'var(--fgColor-muted)' }}>
-        ocoolto · amigo oculto sem complicação
+        ocoolto · amigo oculto pra lá de legal
         {!loggedIn && (
           <>
             {' · '}

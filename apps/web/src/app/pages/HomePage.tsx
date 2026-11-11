@@ -19,7 +19,7 @@ export default function HomePage() {
         >
           <GiftIcon size={28} />
         </span>
-        <h1 style={{ font: 'var(--text-title-shorthand-large)' }}>Amigo oculto, sem complicação</h1>
+        <h1 style={{ font: 'var(--text-title-shorthand-large)' }}>Amigo oculto pra lá de legal</h1>
         <p className="max-w-md" style={{ color: 'var(--fgColor-muted)' }}>
           Sem cadastro, sem senha e sem papelzinho.
         </p>

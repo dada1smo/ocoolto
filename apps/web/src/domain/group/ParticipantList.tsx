@@ -72,7 +72,7 @@ export function ParticipantList({
                 aria-label={`Ver lista de desejos de ${p.name}`}
                 onClick={() => setViewing(p)}
               >
-                Lista de desejos
+                Dicas
               </Button>
             )}
             {group.isRoot && p.targetName && (

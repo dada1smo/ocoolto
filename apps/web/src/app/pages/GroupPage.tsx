@@ -66,8 +66,8 @@ export default function GroupPage() {
         </Section>
       ) : (
         <>
-          {!group.isRoot && <TargetCard name={group.target?.name ?? null} />}
-          {!group.isRoot && <WishesForm groupId={id} group={group} onChange={reload} />}
+          {group.meId && <TargetCard name={group.target?.name ?? null} />}
+          {group.meId && <WishesForm groupId={id} group={group} onChange={reload} />}
           {group.isOwner && <AdminPanel groupId={id} group={group} onChange={reload} />}
           <ParticipantList groupId={id} group={group} onChange={reload} />
         </>
