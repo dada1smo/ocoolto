@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { GiftIcon } from '@primer/octicons-react'
+import { ThemeToggle } from './ThemeToggle'
 import { useMyGroups } from '../domain/group/useMyGroups'
 
 const container = 'mx-auto w-full max-w-2xl px-4'
@@ -24,11 +25,10 @@ export function Page({ children }: { children: ReactNode }) {
             </span>
             ocoolto
           </Link>
-          {loggedIn && (
-            <Link to="/meus-grupos" className="ml-auto">
-              Meus grupos
-            </Link>
-          )}
+          <div className="ml-auto flex items-center gap-3">
+            {loggedIn && <Link to="/meus-grupos">Meus grupos</Link>}
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <main className={`${container} flex flex-1 flex-col gap-6 py-8`}>{children}</main>

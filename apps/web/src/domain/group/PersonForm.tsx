@@ -67,10 +67,14 @@ export function PersonForm({
   return (
     <form onSubmit={submit} onChange={clear} noValidate>
       <Stack gap="normal">
-        {withGroupName &&
-          field('groupName', 'Nome do grupo', { maxLength: 80, placeholder: 'Amigo oculto da família' })}
-        {field('name', 'Nome', { maxLength: 60, autoComplete: 'name' })}
-        {field('email', 'E-mail', { type: 'email', autoComplete: 'email' }, emailCaption)}
+        {withGroupName && field('groupName', 'Nome do grupo', { maxLength: 80, placeholder: 'Amigo oculto da galera' })}
+        {field('name', 'Nome', { maxLength: 60, autoComplete: 'name', placeholder: 'Luiz da Silva' })}
+        {field(
+          'email',
+          'E-mail',
+          { type: 'email', autoComplete: 'email', placeholder: 'luiz@exemplo.com' },
+          emailCaption,
+        )}
         {withTurnstile && <Turnstile key={challenge} />}
         {error && <Banner variant="critical" title="Erro" hideTitle description={error} />}
         <Button type="submit" variant="primary" size="large" block loading={pending}>

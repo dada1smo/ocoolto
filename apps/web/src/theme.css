@@ -44,42 +44,40 @@
   --overlay-backdrop-bgColor: #2b252266;
 }
 
-@media (prefers-color-scheme: dark) {
-  [data-color-mode][data-color-mode='auto'][data-dark-theme] {
-    --brand-emphasis: #d81b60;
-    --brand-hover: #c2185b;
-    --brand-active: #a9154f;
+[data-color-mode='dark'][data-dark-theme] {
+  --brand-emphasis: #d81b60;
+  --brand-hover: #c2185b;
+  --brand-active: #a9154f;
 
-    --fgColor-default: #f2ecea;
-    --fgColor-muted: #a8a0a2;
-    --bgColor-default: #171314;
-    --bgColor-muted: #1f1a1b;
-    --bgColor-inset: #0e0b0c;
-    --bgColor-neutral-muted: #2e2729;
-    --borderColor-default: #3a3234;
-    --borderColor-muted: #2c2527;
+  --fgColor-default: #f2ecea;
+  --fgColor-muted: #a8a0a2;
+  --bgColor-default: #171314;
+  --bgColor-muted: #1f1a1b;
+  --bgColor-inset: #0e0b0c;
+  --bgColor-neutral-muted: #2e2729;
+  --borderColor-default: #3a3234;
+  --borderColor-muted: #2c2527;
 
-    --fgColor-accent: #f06292;
-    --bgColor-accent-emphasis: var(--brand-emphasis);
-    --bgColor-accent-muted: #d81b6026;
-    --borderColor-accent-emphasis: var(--brand-emphasis);
-    --borderColor-accent-muted: #f0629266;
-    --focus-outline-color: #f06292;
+  --fgColor-accent: #f06292;
+  --bgColor-accent-emphasis: var(--brand-emphasis);
+  --bgColor-accent-muted: #d81b6026;
+  --borderColor-accent-emphasis: var(--brand-emphasis);
+  --borderColor-accent-muted: #f0629266;
+  --focus-outline-color: #f06292;
 
-    --button-primary-bgColor-rest: var(--brand-emphasis);
-    --button-primary-bgColor-hover: var(--brand-hover);
-    --button-primary-bgColor-active: var(--brand-active);
-    --button-primary-bgColor-disabled: #6b1a38;
-    --button-primary-fgColor-rest: #ffffff;
+  --button-primary-bgColor-rest: var(--brand-emphasis);
+  --button-primary-bgColor-hover: var(--brand-hover);
+  --button-primary-bgColor-active: var(--brand-active);
+  --button-primary-bgColor-disabled: #6b1a38;
+  --button-primary-fgColor-rest: #ffffff;
 
-    --control-checked-bgColor-hover: var(--brand-hover);
-    --control-checked-bgColor-active: var(--brand-active);
-    --controlTrack-bgColor-rest: #0e0b0c;
-    --controlTrack-bgColor-hover: #2a2325;
-    --controlTrack-bgColor-active: #342c2e;
+  --control-checked-bgColor-hover: var(--brand-hover);
+  --control-checked-bgColor-active: var(--brand-active);
+  --controlTrack-bgColor-rest: #0e0b0c;
+  --controlTrack-bgColor-hover: #2a2325;
+  --controlTrack-bgColor-active: #342c2e;
 
-    --overlay-bgColor: var(--bgColor-default);
-    --overlay-borderColor: var(--borderColor-muted);
-    --overlay-backdrop-bgColor: #0e0b0c99;
-  }
+  --overlay-bgColor: var(--bgColor-default);
+  --overlay-borderColor: var(--borderColor-muted);
+  --overlay-backdrop-bgColor: #0e0b0c99;
 }
