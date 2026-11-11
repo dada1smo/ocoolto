@@ -1,13 +1,23 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router'
-import { GiftIcon } from '@primer/octicons-react'
+import { Link, useNavigate } from 'react-router'
+import { ActionList, ActionMenu, IconButton } from '@primer/react'
+import { GiftIcon, PeopleIcon, PersonIcon, SignOutIcon } from '@primer/octicons-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useMyGroups } from '../domain/group/useMyGroups'
+import { logout } from '../global/auth'
+import { useAction } from '../global/useAction'
 
 const container = 'mx-auto w-full max-w-2xl px-4'
 
 export function Page({ children }: { children: ReactNode }) {
-  const loggedIn = !!useMyGroups().groups
+  const { groups, reload } = useMyGroups()
+  const loggedIn = !!groups
+  const navigate = useNavigate()
+  const { run: signOut } = useAction(async () => {
+    await logout()
+    await reload()
+    navigate('/')
+  })
   return (
     <div className="flex min-h-screen flex-col">
       <header
@@ -25,9 +35,31 @@ export function Page({ children }: { children: ReactNode }) {
             </span>
             ocoolto
           </Link>
-          <div className="ml-auto flex items-center gap-3">
-            {loggedIn && <Link to="/meus-grupos">Meus grupos</Link>}
+          <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
+            {loggedIn && (
+              <ActionMenu>
+                <ActionMenu.Anchor>
+                  <IconButton variant="invisible" icon={PersonIcon} aria-label="Minha conta" />
+                </ActionMenu.Anchor>
+                <ActionMenu.Overlay align="end">
+                  <ActionList>
+                    <ActionList.LinkItem as={Link} to="/meus-grupos">
+                      <ActionList.LeadingVisual>
+                        <PeopleIcon />
+                      </ActionList.LeadingVisual>
+                      Meus grupos
+                    </ActionList.LinkItem>
+                    <ActionList.Item onSelect={() => signOut()}>
+                      <ActionList.LeadingVisual>
+                        <SignOutIcon />
+                      </ActionList.LeadingVisual>
+                      Sair
+                    </ActionList.Item>
+                  </ActionList>
+                </ActionMenu.Overlay>
+              </ActionMenu>
+            )}
           </div>
         </div>
       </header>

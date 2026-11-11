@@ -1,6 +1,6 @@
 // lets the web app typecheck AppType, which reaches the Worker globals (Env, D1Database)
 /// <reference path="../../worker-configuration.d.ts" />
-import { getCookie, setCookie } from 'hono/cookie'
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import { createMiddleware } from 'hono/factory'
 import type { Context } from 'hono'
 
@@ -37,4 +37,14 @@ export async function startSession(c: Context<AppEnv>, email: string) {
     .bind(await sha256(sid), email, Date.now() + SESSION_MS)
     .run()
   setCookie(c, COOKIE, sid, { httpOnly: true, secure: true, sameSite: 'Lax', path: '/', maxAge: SESSION_MS / 1000 })
+}
+
+/** Drops the server-side session (so a copied cookie dies too) and clears the cookie. */
+export async function endSession(c: Context<AppEnv>) {
+  const sid = getCookie(c, COOKIE)
+  if (sid)
+    await c.env.DB.prepare('DELETE FROM sessions WHERE hash = ?')
+      .bind(await sha256(sid))
+      .run()
+  deleteCookie(c, COOKIE, { path: '/', secure: true })
 }

@@ -3,12 +3,17 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { sendMagicLink } from '../lib/email'
 import { guard, isFull } from '../lib/guard'
-import { sha256, startSession, type AppEnv } from '../lib/session'
+import { endSession, sha256, startSession, type AppEnv } from '../lib/session'
 import { groupsOf } from './me'
 
 type Token = { email: string; name: string | null; group_id: string | null }
 
 export const auth = new Hono<AppEnv>()
+  .post('/logout', async (c) => {
+    await endSession(c)
+    return c.json({ ok: true })
+  })
+
   // "find my groups": same answer whether or not the email has groups, so it can't be used to probe emails
   .post(
     '/request',
