@@ -7,7 +7,7 @@ import { AdminPanel } from '../../domain/group/AdminPanel'
 import { JoinGroupForm } from '../../domain/group/JoinGroupForm'
 import { ParticipantList } from '../../domain/group/ParticipantList'
 import { TargetCard } from '../../domain/group/TargetCard'
-import { useGroup } from '../../domain/group/useGroup'
+import { inviteText, useGroup } from '../../domain/group/useGroup'
 import { CopyButton } from '../../ui/CopyButton'
 import { Section } from '../../ui/Section'
 
@@ -41,8 +41,6 @@ export default function GroupPage() {
     )
   if (!group) return <Loading />
 
-  const invite = `${location.origin}/g/${id}`
-
   return (
     <>
       <PageHeader>
@@ -59,7 +57,7 @@ export default function GroupPage() {
         </PageHeader.Description>
         {group.member && !group.drawn && (
           <PageHeader.Actions>
-            <CopyButton label="Copiar convite" value={invite} />
+            <CopyButton label="Copiar convite" value={inviteText(id, group)} />
           </PageHeader.Actions>
         )}
       </PageHeader>

@@ -6,7 +6,7 @@ import { ConfirmAction } from '../../ui/ConfirmAction'
 import { CopyButton } from '../../ui/CopyButton'
 import { Section } from '../../ui/Section'
 import { PersonForm } from './PersonForm'
-import { addParticipant, removeParticipant, type MemberView, type Participant } from './useGroup'
+import { addParticipant, inviteText, removeParticipant, type MemberView, type Participant } from './useGroup'
 
 const initials = (name: string) =>
   name
@@ -97,7 +97,7 @@ export function ParticipantList({
           <CopyButton
             variant="primary"
             label="Copiar convite"
-            value={`${location.origin}/g/${groupId}`}
+            value={inviteText(groupId, group)}
             className="mt-4"
           />
         </Blankslate>
