@@ -32,23 +32,34 @@ export const groups = new Hono<AppEnv>()
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)
     const base = { name: group.name, drawn: group.drawn_at !== null }
+    // `member` discriminates the two views (otherwise TS collapses the union to the smaller one)
+    const anon = { ...base, member: false as const }
     const email = c.get('email')
-    if (!email) return c.json(base)
+    if (!email) return c.json(anon)
 
     const { results } = await c.env.DB.prepare('SELECT id, email, name, target_id FROM participants WHERE group_id = ? ORDER BY rowid')
       .bind(group.id)
       .all<Participant>()
     const me = results.find((p) => p.email === email)
-    if (!me) return c.json(base)
+    if (!me) return c.json(anon)
 
     const isOwner = email === group.owner_email
-    const target = results.find((p) => p.id === me.target_id)
+    const nameOf = (id: string | null) => results.find((p) => p.id === id)?.name ?? null
+    const target = nameOf(me.target_id)
     return c.json({
       ...base,
+      member: true as const,
       isOwner,
       meId: me.id,
-      participants: results.map((p) => ({ id: p.id, name: p.name, isOwner: p.email === group.owner_email })),
-      target: target ? { name: target.name } : null,
+      participants: results.map((p) => ({
+        id: p.id,
+        name: p.name,
+        isOwner: p.email === group.owner_email,
+        // only the owner sees emails and, after the draw, every pair
+        email: isOwner ? p.email : null,
+        targetName: isOwner ? nameOf(p.target_id) : null,
+      })),
+      target: target ? { name: target } : null,
     })
   })
 
@@ -63,6 +74,20 @@ export const groups = new Hono<AppEnv>()
     }
     await sendMagicLink(c, { email, name }, group)
     return c.json({ ok: true })
+  })
+
+  .post('/:id/participants', zValidator('json', person), async (c) => {
+    const group = await getGroup(c.env.DB, c.req.param('id'))
+    if (!group) return c.json({ error: 'not_found' }, 404)
+    if (c.get('email') !== group.owner_email) return c.json({ error: 'forbidden' }, 403)
+    if (group.drawn_at !== null) return c.json({ error: 'already_drawn' }, 409)
+    const { name, email } = c.req.valid('json')
+    // no email is sent: the person logs in later through the invite link with this same email
+    const { meta } = await c.env.DB.prepare('INSERT INTO participants (id, group_id, email, name) VALUES (?, ?, ?, ?) ON CONFLICT (group_id, email) DO NOTHING')
+      .bind(crypto.randomUUID(), group.id, email, name)
+      .run()
+    if (meta.changes === 0) return c.json({ error: 'already_in' }, 409)
+    return c.json({ ok: true }, 201)
   })
 
   .post('/:id/draw', async (c) => {

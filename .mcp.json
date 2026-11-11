@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "my-mcp-server-61c1b2ec": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@primer/mcp@latest"]
+    }
+  }
+}

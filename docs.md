@@ -78,9 +78,10 @@ O organizador é identificado por `owner_email`. Tokens e IDs vêm de `crypto.ra
 | Rota | Quem | O que faz |
 |---|---|---|
 | `POST /api/groups` | qualquer pessoa | `{groupName, name, email, turnstile}` → cria o grupo e envia magic link ao dono |
-| `GET /api/groups/:id` | qualquer pessoa / participante | sem sessão: `{name, drawn}`. Participante: lista, `isOwner` e, depois do sorteio, `target` |
+| `GET /api/groups/:id` | qualquer pessoa / participante | sem sessão: `{name, drawn, member: false}`. Participante: lista, `isOwner` e, depois do sorteio, `target`. Dono: também e-mails e todos os pares |
 | `POST /api/groups/:id/join` | qualquer pessoa | `{name, email, turnstile}` → envia magic link. Serve também para recuperar o acesso |
 | `POST /api/auth` | quem tem o link | `{token}` → valida, cria ou atualiza o participante, cria a sessão (cookie) → `{groupId}` |
+| `POST /api/groups/:id/participants` | dono | `{name, email}` → adiciona a pessoa sem mandar e-mail (ela entra depois pelo link de convite com o mesmo e-mail). Só antes do sorteio |
 | `POST /api/groups/:id/draw` | dono | com 3 ou mais pessoas e ainda não sorteado → grava `target_id` de todos num `db.batch` |
 | `DELETE /api/groups/:id/participants/:pid` | dono | só antes do sorteio |
 
@@ -145,6 +146,12 @@ Escopo:
   - o fluxo completo funciona via `curl`: criar, entrar, autenticar, sortear e cada um vê só o seu par.
 
 ### Fase 3: frontend
+Como rodar:
+- `npm run dev` e abra `localhost:5180`. O link de login sai no console do `[api]`.
+- Node 22 ou 24 (o vitest recusa o Node 23 por causa do `engine-strict`).
+- Camadas em `apps/web/src`: `app/` (rotas e páginas), `global/` (cliente da API, auth, `useAction`), `domain/group/` (formulários, lista, painel do dono, `useGroup`), `ui/` (`Page`, `Section`, `CopyField`).
+- Modo admin = painel do dono em `/g/:id`: adicionar pessoa, remover, sortear e, depois, o botão "Mostrar quem tirou quem" (desligado por padrão, porque o dono também participa).
+
 - As 3 telas, consumindo a API.
 - **Pronto quando:** 3 abas anônimas fazem o fluxo inteiro em `npm run dev`, com o link copiado do console.
 - Separar o app em camadas de app (pages e routes), global (conexao com api, auth, clients), domain (componentes e hooks dos dominios de grupo) e ui (componentes sem regra de negócio, reutilizáveis)
