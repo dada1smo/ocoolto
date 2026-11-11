@@ -9,10 +9,13 @@
     "build": "npm run build -w @ocoolto/web",
     "preview": "npm run build && npm run dev -w @ocoolto/api",
     "test": "npm test -w @ocoolto/api",
-    "typecheck": "npm run typecheck --workspaces"
+    "typecheck": "npm run typecheck --workspaces",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "concurrently": "^10.0.7",
+    "prettier": "^3.10.0",
     "typescript": "^7.0.2"
   },
   "allowScripts": {

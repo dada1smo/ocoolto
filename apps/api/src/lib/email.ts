@@ -6,10 +6,16 @@ const TOKEN_MS = 15 * 60 * 1000
 const LIMIT = 3 // emails per address per hour
 
 /** Creates a single-use login token and emails the magic link. Without a group the link only logs in. */
-export async function sendMagicLink(c: Context<AppEnv>, to: { email: string; name?: string }, group?: { id: string; name: string }) {
+export async function sendMagicLink(
+  c: Context<AppEnv>,
+  to: { email: string; name?: string },
+  group?: { id: string; name: string },
+) {
   // over the limit: skip silently, so the response never reveals anything about the address
   const since = Date.now() - 60 * 60 * 1000
-  const sent = await c.env.DB.prepare('SELECT COUNT(*) AS n FROM email_log WHERE email = ? AND sent_at > ?').bind(to.email, since).first<{ n: number }>()
+  const sent = await c.env.DB.prepare('SELECT COUNT(*) AS n FROM email_log WHERE email = ? AND sent_at > ?')
+    .bind(to.email, since)
+    .first<{ n: number }>()
   if (sent!.n >= LIMIT) return
   await c.env.DB.prepare('INSERT INTO email_log (email, sent_at) VALUES (?, ?)').bind(to.email, Date.now()).run()
 

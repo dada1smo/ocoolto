@@ -25,7 +25,9 @@ function FindGroups() {
         <FormControl required>
           <FormControl.Label>E-mail</FormControl.Label>
           <TextInput block size="large" name="email" type="email" autoComplete="email" />
-          <FormControl.Caption>Use o e-mail com que você entrou nos grupos. Se ele tiver grupos, enviamos um link de acesso.</FormControl.Caption>
+          <FormControl.Caption>
+            Use o e-mail com que você entrou nos grupos. Se ele tiver grupos, enviamos um link de acesso.
+          </FormControl.Caption>
         </FormControl>
         {error && <Banner variant="critical" title="Erro" hideTitle description={error} />}
         <Button type="submit" variant="primary" size="large" block loading={pending}>
