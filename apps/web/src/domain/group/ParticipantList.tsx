@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Button, Dialog, IconButton, Label } from '@primer/react'
+import { useId, useState } from 'react'
+import { Button, Dialog, IconButton, Label, ToggleSwitch } from '@primer/react'
 import { Blankslate } from '@primer/react/experimental'
 import { ArrowRightIcon, GiftIcon, PeopleIcon, PersonAddIcon, TrashIcon } from '@primer/octicons-react'
 import { ConfirmAction } from '../../ui/ConfirmAction'
@@ -29,6 +29,9 @@ export function ParticipantList({
   const [adding, setAdding] = useState(false)
   const [removing, setRemoving] = useState<Participant>()
   const [viewing, setViewing] = useState<Participant>()
+  // root sees every pair only on demand, so a glance at the screen doesn't spoil the draw
+  const [showPairs, setShowPairs] = useState(false)
+  const toggleLabel = useId()
   const editable = group.isOwner && !group.drawn
   const onlyOwner = group.participants.length === 1
 
@@ -43,6 +46,14 @@ export function ParticipantList({
         )
       }
     >
+      {group.isRoot && group.drawn && (
+        <div className="mb-2 flex items-center justify-between gap-4">
+          <span id={toggleLabel} className="font-semibold">
+            Mostrar quem tirou quem
+          </span>
+          <ToggleSwitch aria-labelledby={toggleLabel} checked={showPairs} onClick={() => setShowPairs(!showPairs)} />
+        </div>
+      )}
       <ul className="-my-2 flex flex-col divide-y" style={{ borderColor: 'var(--borderColor-muted)' }}>
         {group.participants.map((p) => (
           <li key={p.id} className="flex items-center gap-3 py-3" style={{ borderColor: 'var(--borderColor-muted)' }}>
@@ -75,7 +86,7 @@ export function ParticipantList({
                 Dicas
               </Button>
             )}
-            {group.isRoot && p.targetName && (
+            {showPairs && group.isRoot && p.targetName && (
               <span className="flex items-center gap-1 font-semibold">
                 <span style={{ color: 'var(--fgColor-muted)' }}>
                   <ArrowRightIcon aria-label="tirou" />
