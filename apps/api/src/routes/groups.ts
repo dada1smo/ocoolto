@@ -6,7 +6,14 @@ import { sendMagicLink } from '../lib/email'
 import { guard, isFull } from '../lib/guard'
 import { isRoot, type AppEnv } from '../lib/session'
 
-type Group = { id: string; name: string; owner_email: string; drawn_at: number | null }
+type Group = {
+  id: string
+  name: string
+  owner_email: string
+  drawn_at: number | null
+  event_date: string | null
+  description: string | null
+}
 type Participant = {
   id: string
   email: string
@@ -22,11 +29,16 @@ const person = z.object({
   turnstile: z.string().min(1),
 })
 
+const groupName = z.string().trim().min(1).max(80)
+
 const getGroup = (db: D1Database, id: string) =>
-  db.prepare('SELECT id, name, owner_email, drawn_at FROM groups WHERE id = ?').bind(id).first<Group>()
+  db
+    .prepare('SELECT id, name, owner_email, drawn_at, event_date, description FROM groups WHERE id = ?')
+    .bind(id)
+    .first<Group>()
 
 export const groups = new Hono<AppEnv>()
-  .post('/', zValidator('json', person.extend({ groupName: z.string().trim().min(1).max(80) })), async (c) => {
+  .post('/', zValidator('json', person.extend({ groupName })), async (c) => {
     const { groupName, name, email, turnstile } = c.req.valid('json')
     const blocked = await guard(c, turnstile)
     if (blocked) return blocked
@@ -41,7 +53,12 @@ export const groups = new Hono<AppEnv>()
   .get('/:id', async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))
     if (!group) return c.json({ error: 'not_found' }, 404)
-    const base = { name: group.name, drawn: group.drawn_at !== null }
+    const base = {
+      name: group.name,
+      drawn: group.drawn_at !== null,
+      eventDate: group.event_date,
+      description: group.description,
+    }
     // `member` discriminates the two views (otherwise TS collapses the union to the smaller one)
     const anon = { ...base, member: false as const }
     const email = c.get('email')
@@ -78,6 +95,29 @@ export const groups = new Hono<AppEnv>()
       target: target ? { name: target } : null,
     })
   })
+
+  .put(
+    '/:id',
+    zValidator(
+      'json',
+      z.object({
+        name: groupName,
+        eventDate: z.union([z.literal(''), z.iso.date()]),
+        description: z.string().trim().max(1000),
+      }),
+    ),
+    async (c) => {
+      const group = await getGroup(c.env.DB, c.req.param('id'))
+      if (!group) return c.json({ error: 'not_found' }, 404)
+      if (c.get('email') !== group.owner_email) return c.json({ error: 'forbidden' }, 403)
+      const { name, eventDate, description } = c.req.valid('json')
+      // empty strings clear the optional fields
+      await c.env.DB.prepare('UPDATE groups SET name = ?, event_date = ?, description = ? WHERE id = ?')
+        .bind(name, eventDate || null, description || null, group.id)
+        .run()
+      return c.json({ ok: true })
+    },
+  )
 
   .put('/:id/me/wishes', zValidator('json', z.object({ wishes: z.string().trim().max(1000) })), async (c) => {
     const group = await getGroup(c.env.DB, c.req.param('id'))

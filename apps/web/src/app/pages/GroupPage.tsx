@@ -3,6 +3,8 @@ import { Label, PageHeader, SkeletonBox } from '@primer/react'
 import { Blankslate, SkeletonText } from '@primer/react/experimental'
 import { AlertIcon } from '@primer/octicons-react'
 import { AdminPanel } from '../../domain/group/AdminPanel'
+import { EditableTitle } from '../../domain/group/EditableTitle'
+import { GroupDetails } from '../../domain/group/GroupDetails'
 import { JoinGroupForm } from '../../domain/group/JoinGroupForm'
 import { ParticipantList } from '../../domain/group/ParticipantList'
 import { TargetCard } from '../../domain/group/TargetCard'
@@ -43,7 +45,7 @@ export default function GroupPage() {
     <>
       <PageHeader>
         <PageHeader.TitleArea variant="large">
-          <PageHeader.Title as="h1">{group.name}</PageHeader.Title>
+          <EditableTitle groupId={id} group={group} canEdit={group.member && group.isOwner} onChange={reload} />
         </PageHeader.TitleArea>
         <PageHeader.Description>
           {group.drawn ? <Label variant="done">Sorteado</Label> : <Label variant="success">Aberto</Label>}
@@ -59,6 +61,8 @@ export default function GroupPage() {
           </PageHeader.Actions>
         )}
       </PageHeader>
+
+      <GroupDetails groupId={id} group={group} canEdit={group.member && group.isOwner} onChange={reload} />
 
       {!group.member ? (
         <Section title={group.drawn ? 'Já participa? Receba um novo link' : 'Entrar no grupo'}>

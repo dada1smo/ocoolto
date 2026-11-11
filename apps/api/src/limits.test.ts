@@ -79,7 +79,7 @@ test('global cap lowered to 2 blocks the 3rd send', async () => {
 })
 
 test('group joins stop at 50 participants', async () => {
-  d1.db.prepare("INSERT INTO groups VALUES ('g1', 'g', 'o@x.com', NULL, 0)").run()
+  d1.db.prepare("INSERT INTO groups (id, name, owner_email, created_at) VALUES ('g1', 'g', 'o@x.com', 0)").run()
   for (let i = 0; i < 50; i++)
     d1.db
       .prepare("INSERT INTO participants (id, group_id, email, name) VALUES (?, 'g1', ?, 'n')")
@@ -103,4 +103,37 @@ test('login token is single-use and expires', async () => {
   expect((await post('/api/auth', { token: 'ok' })).status).toBe(200)
   expect((await post('/api/auth', { token: 'ok' })).status).toBe(400)
   expect((await post('/api/auth', { token: 'old' })).status).toBe(400)
+})
+
+test('only the owner edits name, date and description', async () => {
+  d1.db.prepare("INSERT INTO groups (id, name, owner_email, created_at) VALUES ('g1', 'g', 'o@x.com', 0)").run()
+  const login = async (email: string) => {
+    const sid = `sid-${email}`
+    d1.db
+      .prepare('INSERT OR IGNORE INTO sessions (hash, email, expires_at) VALUES (?, ?, ?)')
+      .run(await sha256(sid), email, Date.now() + 60_000)
+    return sid
+  }
+  const put = async (email: string, body: object) =>
+    app.request(
+      '/api/groups/g1',
+      {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json', cookie: `sid=${await login(email)}` },
+        body: JSON.stringify(body),
+      },
+      env,
+    )
+  const body = { name: 'Novo', eventDate: '2026-12-24', description: 'Em casa' }
+  expect((await put('x@x.com', body)).status).toBe(403)
+  expect((await put('o@x.com', { ...body, name: '' })).status).toBe(400)
+  expect((await put('o@x.com', { ...body, eventDate: 'ontem' })).status).toBe(400)
+  expect((await put('o@x.com', body)).status).toBe(200)
+  const row = d1.db.prepare('SELECT name, event_date, description FROM groups').get()
+  expect({ ...row }).toEqual({ name: 'Novo', event_date: '2026-12-24', description: 'Em casa' })
+  expect((await put('o@x.com', { name: 'Novo', eventDate: '', description: '' })).status).toBe(200)
+  expect({ ...d1.db.prepare('SELECT event_date, description FROM groups').get() }).toEqual({
+    event_date: null,
+    description: null,
+  })
 })
