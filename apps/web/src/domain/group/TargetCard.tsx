@@ -15,9 +15,7 @@ export function TargetCard({ name }: { name: string | null }) {
             <ClockIcon size="medium" />
           </Blankslate.Visual>
           <Blankslate.Heading as="h2">Aguardando o sorteio</Blankslate.Heading>
-          <Blankslate.Description>
-            Volte aqui depois que o organizador sortear para ver quem você tirou.
-          </Blankslate.Description>
+          <Blankslate.Description>Depois do sorteio você verá o nome do seu amigo secreto aqui.</Blankslate.Description>
         </Blankslate>
       </div>
     )

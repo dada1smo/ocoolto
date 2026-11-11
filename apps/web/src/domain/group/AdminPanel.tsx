@@ -45,8 +45,8 @@ export function AdminPanel({ groupId, group, onChange }: { groupId: string; grou
   return (
     <Section title="Sorteio">
       <p style={{ color: 'var(--fgColor-muted)' }}>
-        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra, a menos que você desfaça o
-        sorteio.
+        Quando todo mundo entrar, clique em sortear. Cada pessoa verá só quem tirou. Dá pra mudar depois, mas é melhor
+        não contar pra ninguém.
       </p>
       {tooFew && count < MIN && (
         <Banner

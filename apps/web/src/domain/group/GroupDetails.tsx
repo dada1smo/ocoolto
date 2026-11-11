@@ -105,9 +105,7 @@ export function GroupDetails({
           {group.description && <p className="whitespace-pre-wrap wrap-break-word">{group.description}</p>}
         </div>
       ) : (
-        <p style={{ color: 'var(--fgColor-muted)' }}>
-          Nenhum detalhe informado. Use o lápis para adicionar data e descrição.
-        </p>
+        <p style={{ color: 'var(--fgColor-muted)' }}>Quando e como será a confra dos amigos?</p>
       )}
     </Section>
   )
