@@ -16,7 +16,7 @@ export async function sendMagicLink(
   const sent = await c.env.DB.prepare('SELECT COUNT(*) AS n FROM email_log WHERE email = ? AND sent_at > ?')
     .bind(to.email, since)
     .first<{ n: number }>()
-  if (sent!.n >= LIMIT) return
+  if (sent!.n >= LIMIT && c.env.ENV !== 'dev') return
   await c.env.DB.prepare('INSERT INTO email_log (email, sent_at) VALUES (?, ?)').bind(to.email, Date.now()).run()
 
   const token = crypto.randomUUID()
