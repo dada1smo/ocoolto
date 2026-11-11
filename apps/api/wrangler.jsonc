@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "ocoolto",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    // React build; /api/* goes to the Worker, everything else is the SPA
+    "directory": "../web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    // database_id is filled in phase 5 (wrangler d1 create ocoolto); local dev ignores it
+    { "binding": "DB", "database_name": "ocoolto", "database_id": "local" }
+  ],
+  "vars": {
+    "EMAIL_FROM": "ocoolto <nao-responda@ocoolto.com>"
+  }
+  // .dev.vars sets ENV=dev locally (magic link goes to the console)
+  // secrets in production: RESEND_API_KEY
+}
