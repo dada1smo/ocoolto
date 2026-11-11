@@ -26,5 +26,5 @@
     "GLOBAL_EMAIL_LIMIT": "90"
   }
   // .dev.vars sets ENV=dev locally (magic link goes to the console) and Cloudflare's test Turnstile secret
-  // secrets in production: RESEND_API_KEY, TURNSTILE_SECRET
+  // secrets in production: RESEND_API_KEY, TURNSTILE_SECRET, ROOT_EMAIL
 }

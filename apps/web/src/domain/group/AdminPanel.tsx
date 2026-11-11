@@ -1,5 +1,5 @@
-import { useId, useState } from 'react'
-import { Banner, Button, ToggleSwitch } from '@primer/react'
+import { useState } from 'react'
+import { Banner, Button } from '@primer/react'
 import { SyncIcon, UndoIcon } from '@primer/octicons-react'
 import { ConfirmAction } from '../../ui/ConfirmAction'
 import { Section } from '../../ui/Section'
@@ -7,46 +7,24 @@ import { drawGroup, undrawGroup, type MemberView } from './useGroup'
 
 const MIN = 3
 
-/** Owner-only: run the draw, then toggle the full result. */
+/** Owner-only: run or undo the draw. */
 export function AdminPanel({
   groupId,
   group,
-  showPairs,
-  onShowPairs,
   onChange,
 }: {
   groupId: string
   group: MemberView
-  showPairs: boolean
-  onShowPairs: (v: boolean) => void
   onChange: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
   const [undoing, setUndoing] = useState(false)
   const [tooFew, setTooFew] = useState(false)
-  const toggleLabel = useId()
-  const toggleCaption = useId()
   const count = group.participants.length
 
   if (group.drawn)
     return (
-      <Section title="Resultado completo">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span id={toggleLabel} className="font-semibold">
-              Mostrar quem tirou quem
-            </span>
-            <span id={toggleCaption} className="text-sm" style={{ color: 'var(--fgColor-muted)' }}>
-              Você também participa: ligado, isso revela o seu amigo oculto.
-            </span>
-          </div>
-          <ToggleSwitch
-            aria-labelledby={toggleLabel}
-            aria-describedby={toggleCaption}
-            checked={showPairs}
-            onClick={() => onShowPairs(!showPairs)}
-          />
-        </div>
+      <Section title="Sorteio feito">
         <Button leadingVisual={UndoIcon} onClick={() => setUndoing(true)}>
           Desfazer sorteio
         </Button>
@@ -56,7 +34,6 @@ export function AdminPanel({
             confirmLabel="Desfazer sorteio"
             onConfirm={async () => {
               await undrawGroup(groupId)
-              onShowPairs(false)
               onChange()
             }}
             onClose={() => setUndoing(false)}

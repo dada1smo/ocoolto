@@ -20,12 +20,10 @@ const initials = (name: string) =>
 export function ParticipantList({
   groupId,
   group,
-  showPairs,
   onChange,
 }: {
   groupId: string
   group: MemberView
-  showPairs: boolean
   onChange: () => void
 }) {
   const [adding, setAdding] = useState(false)
@@ -77,7 +75,7 @@ export function ParticipantList({
                 Lista de desejos
               </Button>
             )}
-            {showPairs && p.targetName && (
+            {group.isRoot && p.targetName && (
               <span className="flex items-center gap-1 font-semibold">
                 <span style={{ color: 'var(--fgColor-muted)' }}>
                   <ArrowRightIcon aria-label="tirou" />

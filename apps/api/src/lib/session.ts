@@ -9,6 +9,12 @@ export type AppEnv = { Bindings: Env; Variables: { email?: string } }
 const COOKIE = 'sid'
 const SESSION_MS = 60 * 24 * 60 * 60 * 1000
 
+/** Root = the logged-in email matches the ROOT_EMAIL secret (read-only access to every group). */
+export const isRoot = (c: Context<AppEnv>) => {
+  const email = c.get('email')
+  return !!email && email === c.env.ROOT_EMAIL?.trim().toLowerCase()
+}
+
 export async function sha256(s: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')

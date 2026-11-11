@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { draw } from '../lib/draw'
 import { sendMagicLink } from '../lib/email'
 import { guard, isFull } from '../lib/guard'
-import type { AppEnv } from '../lib/session'
+import { isRoot, type AppEnv } from '../lib/session'
 
 type Group = { id: string; name: string; owner_email: string; drawn_at: number | null }
 type Participant = {
@@ -52,24 +52,26 @@ export const groups = new Hono<AppEnv>()
     )
       .bind(group.id)
       .all<Participant>()
+    const root = isRoot(c)
     const me = results.find((p) => p.email === email)
-    if (!me) return c.json(anon)
+    if (!me && !root) return c.json(anon)
 
     const isOwner = email === group.owner_email
     const nameOf = (id: string | null) => results.find((p) => p.id === id)?.name ?? null
-    const target = nameOf(me.target_id)
+    const target = nameOf(me?.target_id ?? null)
     return c.json({
       ...base,
       member: true as const,
       isOwner,
-      meId: me.id,
+      isRoot: root,
+      meId: me?.id ?? null,
       participants: results.map((p) => ({
         id: p.id,
         name: p.name,
         isOwner: p.email === group.owner_email,
-        // only the owner sees emails and, after the draw, every pair
-        email: isOwner ? p.email : null,
-        targetName: isOwner ? nameOf(p.target_id) : null,
+        // the owner sees emails; only root sees who drew whom
+        email: isOwner || root ? p.email : null,
+        targetName: root ? nameOf(p.target_id) : null,
         wishes: p.wishes,
         wishesAt: p.wishes_at,
       })),

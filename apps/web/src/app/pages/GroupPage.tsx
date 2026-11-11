@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useParams } from 'react-router'
 import { Label, PageHeader, SkeletonBox } from '@primer/react'
 import { Blankslate, SkeletonText } from '@primer/react/experimental'
@@ -26,8 +25,6 @@ function Loading() {
 export default function GroupPage() {
   const id = useParams().id!
   const { group, error, reload } = useGroup(id)
-  // owner is also a participant, so the full result stays hidden until they ask
-  const [showPairs, setShowPairs] = useState(false)
 
   if (error)
     return (
@@ -56,7 +53,7 @@ export default function GroupPage() {
             </span>
           )}
         </PageHeader.Description>
-        {group.member && !group.drawn && (
+        {group.member && !group.isRoot && !group.drawn && (
           <PageHeader.Actions>
             <CopyButton label="Copiar convite" value={inviteText(id, group)} />
           </PageHeader.Actions>
@@ -69,12 +66,10 @@ export default function GroupPage() {
         </Section>
       ) : (
         <>
-          <TargetCard name={group.target?.name ?? null} />
-          <WishesForm groupId={id} group={group} onChange={reload} />
-          {group.isOwner && (
-            <AdminPanel groupId={id} group={group} showPairs={showPairs} onShowPairs={setShowPairs} onChange={reload} />
-          )}
-          <ParticipantList groupId={id} group={group} showPairs={showPairs} onChange={reload} />
+          {!group.isRoot && <TargetCard name={group.target?.name ?? null} />}
+          {!group.isRoot && <WishesForm groupId={id} group={group} onChange={reload} />}
+          {group.isOwner && <AdminPanel groupId={id} group={group} onChange={reload} />}
+          <ParticipantList groupId={id} group={group} onChange={reload} />
         </>
       )}
     </>

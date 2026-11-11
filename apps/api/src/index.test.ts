@@ -6,3 +6,8 @@ test('GET /api/health', async () => {
   expect(res.status).toBe(200)
   expect(await res.json()).toEqual({ status: 'ok' })
 })
+
+test('GET /api/me/root is forbidden without a root session', async () => {
+  const res = await app.request('/api/me/root')
+  expect(res.status).toBe(403)
+})

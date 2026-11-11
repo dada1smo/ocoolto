@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import GroupPage from './pages/GroupPage'
 import AuthPage from './pages/AuthPage'
 import MyGroupsPage from './pages/MyGroupsPage'
+import RootPage from './pages/RootPage'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
             <Route path="/g/:id" element={<GroupPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/meus-grupos" element={<MyGroupsPage />} />
+            <Route path="/root" element={<RootPage />} />
           </Routes>
         </Page>
       </MyGroupsProvider>
