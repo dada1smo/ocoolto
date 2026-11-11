@@ -13,7 +13,14 @@ export function useGroup(id: string) {
   const [group, setGroup] = useState<GroupData>()
   const [error, setError] = useState<string>()
   const reload = useCallback(
-    () => fetchGroup(id).then(setGroup, (e: Error) => setError(e.message)),
+    () =>
+      fetchGroup(id).then(
+        (g) => {
+          setGroup(g)
+          setError(undefined)
+        },
+        (e: Error) => setError(e.message),
+      ),
     [id],
   )
   useEffect(() => {

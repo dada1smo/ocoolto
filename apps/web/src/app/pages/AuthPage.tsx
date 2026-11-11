@@ -1,8 +1,9 @@
 import { useNavigate, useSearchParams } from 'react-router'
 import { Banner, Button } from '@primer/react'
+import { Blankslate } from '@primer/react/experimental'
+import { AlertIcon, KeyIcon } from '@primer/octicons-react'
 import { login } from '../../global/auth'
 import { useAction } from '../../global/useAction'
-import { Section } from '../../ui/Section'
 
 /** A button instead of auto-login: mail scanners open links first and would spend the one-time token. */
 export default function AuthPage() {
@@ -12,13 +13,40 @@ export default function AuthPage() {
     const { groupId } = await login(token!)
     navigate(`/g/${groupId}`, { replace: true })
   })
-  if (!token) return <Banner variant="critical" title="Link incompleto" description="Abra o link exatamente como chegou no e-mail." />
+
+  if (!token)
+    return (
+      <Blankslate border spacious>
+        <Blankslate.Visual>
+          <AlertIcon size="medium" />
+        </Blankslate.Visual>
+        <Blankslate.Heading as="h1">Link incompleto</Blankslate.Heading>
+        <Blankslate.Description>Abra o link exatamente como chegou no e-mail.</Blankslate.Description>
+        <Blankslate.PrimaryAction href="/">Voltar ao início</Blankslate.PrimaryAction>
+      </Blankslate>
+    )
+
   return (
-    <Section title="Entrar no amigo oculto">
-      {error && <Banner variant="critical" title="Erro" hideTitle description={error} />}
-      <Button variant="primary" size="large" block loading={pending} onClick={() => run()}>
-        Entrar
-      </Button>
-    </Section>
+    <div style={{ background: 'var(--bgColor-default)', borderRadius: 'var(--borderRadius-large)' }}>
+      <Blankslate border spacious>
+        <Blankslate.Visual>
+          <KeyIcon size="medium" />
+        </Blankslate.Visual>
+        <Blankslate.Heading as="h1">Quase lá</Blankslate.Heading>
+        <Blankslate.Description>Toque no botão para entrar no seu amigo oculto.</Blankslate.Description>
+        <div className="mt-4 flex w-full max-w-xs flex-col gap-3">
+          {error && (
+            <Banner
+              variant="critical"
+              title="Não deu para entrar"
+              description={`${error} Abra a página do grupo e peça um novo link.`}
+            />
+          )}
+          <Button variant="primary" size="large" block loading={pending} onClick={() => run()}>
+            Entrar
+          </Button>
+        </div>
+      </Blankslate>
+    </div>
   )
 }

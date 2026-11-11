@@ -1,6 +1,53 @@
-import { Banner } from '@primer/react'
+import { useState } from 'react'
+import { Button } from '@primer/react'
+import { Blankslate } from '@primer/react/experimental'
+import { ClockIcon, EyeClosedIcon, EyeIcon, GiftIcon } from '@primer/octicons-react'
 
+/** The participant's own result; hidden until they tap, in case someone is looking at the screen. */
 export function TargetCard({ name }: { name: string | null }) {
-  if (!name) return <Banner variant="info" title="Aguardando sorteio" description="O organizador ainda não sorteou." />
-  return <Banner variant="success" title="Você tirou" description={<span className="text-2xl font-bold">{name}</span>} />
+  const [revealed, setRevealed] = useState(false)
+
+  if (!name)
+    return (
+      <div style={{ background: 'var(--bgColor-default)', borderRadius: 'var(--borderRadius-large)' }}>
+        <Blankslate border>
+          <Blankslate.Visual>
+            <ClockIcon size="medium" />
+          </Blankslate.Visual>
+          <Blankslate.Heading as="h2">Aguardando o sorteio</Blankslate.Heading>
+          <Blankslate.Description>
+            Volte aqui depois que o organizador sortear para ver quem você tirou.
+          </Blankslate.Description>
+        </Blankslate>
+      </div>
+    )
+
+  return (
+    <section
+      aria-labelledby="target-title"
+      className="flex flex-col items-center gap-4 border px-6 py-10 text-center"
+      style={{
+        background: 'var(--bgColor-accent-muted)',
+        borderColor: 'var(--borderColor-accent-muted)',
+        borderRadius: 'var(--borderRadius-large)',
+      }}
+    >
+      <span style={{ color: 'var(--fgColor-accent)' }}>
+        <GiftIcon size={32} />
+      </span>
+      <h2 id="target-title" style={{ font: 'var(--text-title-shorthand-small)', color: 'var(--fgColor-muted)' }}>
+        Você tirou
+      </h2>
+      <p
+        aria-live="polite"
+        className={revealed ? '' : 'select-none blur-md'}
+        style={{ font: 'var(--text-display-shorthand)', color: 'var(--fgColor-default)' }}
+      >
+        {revealed ? name : '••••••••'}
+      </p>
+      <Button leadingVisual={revealed ? EyeClosedIcon : EyeIcon} onClick={() => setRevealed(!revealed)}>
+        {revealed ? 'Esconder' : 'Revelar'}
+      </Button>
+    </section>
+  )
 }

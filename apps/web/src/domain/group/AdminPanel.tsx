@@ -1,11 +1,13 @@
-import { Banner, Button, Stack, ToggleSwitch } from '@primer/react'
-import { useId } from 'react'
-import { useAction } from '../../global/useAction'
+import { useId, useState } from 'react'
+import { Banner, Button, ToggleSwitch } from '@primer/react'
+import { SyncIcon } from '@primer/octicons-react'
+import { ConfirmAction } from '../../ui/ConfirmAction'
 import { Section } from '../../ui/Section'
-import { PersonForm } from './PersonForm'
-import { addParticipant, drawGroup, type MemberView } from './useGroup'
+import { drawGroup, type MemberView } from './useGroup'
 
-/** Owner-only: add people, run the draw, toggle the full result. */
+const MIN = 3
+
+/** Owner-only: run the draw, then toggle the full result. */
 export function AdminPanel({
   groupId,
   group,
@@ -19,45 +21,69 @@ export function AdminPanel({
   onShowPairs: (v: boolean) => void
   onChange: () => void
 }) {
-  const draw = useAction(async () => {
-    await drawGroup(groupId)
-    onChange()
-  })
+  const [confirming, setConfirming] = useState(false)
+  const [tooFew, setTooFew] = useState(false)
   const toggleLabel = useId()
+  const toggleCaption = useId()
   const count = group.participants.length
 
   if (group.drawn)
     return (
-      <Section title="Administração">
+      <Section title="Resultado completo">
         <div className="flex items-center justify-between gap-4">
-          <span id={toggleLabel}>Mostrar quem tirou quem</span>
-          <ToggleSwitch aria-labelledby={toggleLabel} checked={showPairs} onClick={() => onShowPairs(!showPairs)} />
+          <div className="flex flex-col gap-1">
+            <span id={toggleLabel} className="font-semibold">
+              Mostrar quem tirou quem
+            </span>
+            <span id={toggleCaption} className="text-sm" style={{ color: 'var(--fgColor-muted)' }}>
+              Você também participa: ligado, isso revela o seu amigo oculto.
+            </span>
+          </div>
+          <ToggleSwitch
+            aria-labelledby={toggleLabel}
+            aria-describedby={toggleCaption}
+            checked={showPairs}
+            onClick={() => onShowPairs(!showPairs)}
+          />
         </div>
       </Section>
     )
 
   return (
-    <Section title="Administração">
-      <PersonForm
-        submitLabel="Adicionar pessoa"
-        onSubmit={async (f) => {
-          await addParticipant(groupId, { name: f.name, email: f.email })
-          onChange()
-        }}
-      />
-      <Stack gap="condensed">
-        {draw.error && <Banner variant="critical" title="Erro" hideTitle description={draw.error} />}
-        <Button
-          variant="danger"
-          block
-          loading={draw.pending}
-          disabled={count < 3}
-          onClick={() => confirm('Sortear agora? Depois não dá para desfazer nem entrar gente nova.') && draw.run()}
+    <Section title="Sorteio">
+      <p style={{ color: 'var(--fgColor-muted)' }}>
+        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra e não dá para refazer.
+      </p>
+      {tooFew && count < MIN && (
+        <Banner
+          variant="warning"
+          title="Faltam pessoas"
+          hideTitle
+          description={`Adicione pelo menos mais ${MIN - count} ${MIN - count === 1 ? 'pessoa' : 'pessoas'} para sortear.`}
+        />
+      )}
+      <Button
+        variant="primary"
+        size="large"
+        block
+        leadingVisual={SyncIcon}
+        onClick={() => (count < MIN ? setTooFew(true) : setConfirming(true))}
+      >
+        Sortear agora
+      </Button>
+      {confirming && (
+        <ConfirmAction
+          title="Sortear agora?"
+          confirmLabel={`Sortear ${count} pessoas`}
+          onConfirm={async () => {
+            await drawGroup(groupId)
+            onChange()
+          }}
+          onClose={() => setConfirming(false)}
         >
-          Sortear ({count} pessoas)
-        </Button>
-        {count < 3 && <span className="text-sm" style={{ color: 'var(--fgColor-muted)' }}>São necessárias pelo menos 3 pessoas.</span>}
-      </Stack>
+          Depois do sorteio não dá para desfazer nem entrar gente nova. Cada pessoa vê só quem tirou.
+        </ConfirmAction>
+      )}
     </Section>
   )
 }
