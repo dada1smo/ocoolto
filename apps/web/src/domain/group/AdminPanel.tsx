@@ -4,19 +4,12 @@ import { SyncIcon, UndoIcon } from '@primer/octicons-react'
 import { ConfirmAction } from '../../ui/ConfirmAction'
 import { Section } from '../../ui/Section'
 import { drawGroup, undrawGroup, type MemberView } from './useGroup'
+import { formatEditedAt } from './WishesForm'
 
 const MIN = 3
 
 /** Owner-only: run or undo the draw. */
-export function AdminPanel({
-  groupId,
-  group,
-  onChange,
-}: {
-  groupId: string
-  group: MemberView
-  onChange: () => void
-}) {
+export function AdminPanel({ groupId, group, onChange }: { groupId: string; group: MemberView; onChange: () => void }) {
   const [confirming, setConfirming] = useState(false)
   const [undoing, setUndoing] = useState(false)
   const [tooFew, setTooFew] = useState(false)
@@ -25,6 +18,11 @@ export function AdminPanel({
   if (group.drawn)
     return (
       <Section title="Sorteio feito">
+        {group.drawnAt && (
+          <p className="mb-3" style={{ color: 'var(--fgColor-muted)' }}>
+            Sorteado em {formatEditedAt(group.drawnAt)}.
+          </p>
+        )}
         <Button leadingVisual={UndoIcon} onClick={() => setUndoing(true)}>
           Desfazer sorteio
         </Button>
@@ -47,7 +45,8 @@ export function AdminPanel({
   return (
     <Section title="Sorteio">
       <p style={{ color: 'var(--fgColor-muted)' }}>
-        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra, a menos que você desfaça o sorteio.
+        Quando todo mundo tiver entrado, faça o sorteio. Depois disso ninguém mais entra, a menos que você desfaça o
+        sorteio.
       </p>
       {tooFew && count < MIN && (
         <Banner

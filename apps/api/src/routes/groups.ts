@@ -56,6 +56,7 @@ export const groups = new Hono<AppEnv>()
     const base = {
       name: group.name,
       drawn: group.drawn_at !== null,
+      drawnAt: group.drawn_at,
       eventDate: group.event_date,
       description: group.description,
     }
