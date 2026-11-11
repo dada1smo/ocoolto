@@ -3,15 +3,18 @@ import { Banner, Button } from '@primer/react'
 import { Blankslate } from '@primer/react/experimental'
 import { AlertIcon, KeyIcon } from '@primer/octicons-react'
 import { login } from '../../global/auth'
+import { useMyGroups } from '../../domain/group/useMyGroups'
 import { useAction } from '../../global/useAction'
 
 /** A button instead of auto-login: mail scanners open links first and would spend the one-time token. */
 export default function AuthPage() {
   const token = useSearchParams()[0].get('t')
   const navigate = useNavigate()
+  const { reload } = useMyGroups()
   const { run, pending, error } = useAction(async () => {
     const { groupId } = await login(token!)
-    navigate(`/g/${groupId}`, { replace: true })
+    await reload() // header and list must see the new session
+    navigate(groupId ? `/g/${groupId}` : '/meus-grupos', { replace: true })
   })
 
   if (!token)
