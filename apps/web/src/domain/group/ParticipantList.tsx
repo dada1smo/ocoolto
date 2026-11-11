@@ -37,7 +37,7 @@ export function ParticipantList({
       title={`Participantes (${group.participants.length})`}
       actions={
         editable && (
-          <Button size="small" leadingVisual={PersonAddIcon} onClick={() => setAdding(true)}>
+          <Button size="medium" leadingVisual={PersonAddIcon} onClick={() => setAdding(true)}>
             Adicionar pessoa
           </Button>
         )
@@ -74,7 +74,12 @@ export function ParticipantList({
               </span>
             )}
             {editable && !p.isOwner && (
-              <IconButton icon={TrashIcon} variant="invisible" aria-label={`Remover ${p.name}`} onClick={() => setRemoving(p)} />
+              <IconButton
+                icon={TrashIcon}
+                variant="invisible"
+                aria-label={`Remover ${p.name}`}
+                onClick={() => setRemoving(p)}
+              />
             )}
           </li>
         ))}
@@ -89,12 +94,21 @@ export function ParticipantList({
           <Blankslate.Description>
             Copie o convite e mande no grupo da família ou dos amigos. Cada pessoa entra com o próprio e-mail.
           </Blankslate.Description>
-          <CopyButton variant="primary" label="Copiar convite" value={`${location.origin}/g/${groupId}`} />
+          <CopyButton
+            variant="primary"
+            label="Copiar convite"
+            value={`${location.origin}/g/${groupId}`}
+            className="mt-4"
+          />
         </Blankslate>
       )}
 
       {adding && (
-        <Dialog title="Adicionar pessoa" subtitle="Nenhum e-mail é enviado agora. Ela entra depois pelo convite, com este mesmo e-mail." onClose={() => setAdding(false)}>
+        <Dialog
+          title="Adicionar pessoa"
+          subtitle="Nenhum e-mail é enviado agora. Ela entra depois pelo convite, com este mesmo e-mail."
+          onClose={() => setAdding(false)}
+        >
           <PersonForm
             submitLabel="Adicionar"
             onSubmit={async (f) => {

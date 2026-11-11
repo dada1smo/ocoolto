@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { Banner, Button, FormControl, Stack, TextInput } from '@primer/react'
+import { ActionList, Banner, Button, FormControl, Label, Stack, TextInput } from '@primer/react'
 import { CheckEmail } from '../../domain/group/CheckEmail'
 import { useMyGroups } from '../../domain/group/useMyGroups'
 import { requestLink } from '../../global/auth'
@@ -49,18 +49,16 @@ export default function MyGroupsPage() {
     )
   return (
     <Section title="Meus grupos">
-      <ul className="flex flex-col gap-2">
+      <ActionList variant="full" showDividers>
         {groups.map((g) => (
-          <li key={g.id}>
-            <Link to={`/g/${g.id}`} className="font-semibold">
-              {g.name}
-            </Link>
-            <span className="ml-2 text-sm" style={{ color: 'var(--fgColor-muted)' }}>
-              {g.drawn ? 'sorteado' : 'aberto'}
-            </span>
-          </li>
+          <ActionList.LinkItem key={g.id} as={Link} to={`/g/${g.id}`} size="large">
+            {g.name}
+            <ActionList.TrailingVisual>
+              <Label variant={g.drawn ? 'success' : 'default'}>{g.drawn ? 'Sorteado' : 'Aberto'}</Label>
+            </ActionList.TrailingVisual>
+          </ActionList.LinkItem>
         ))}
-      </ul>
+      </ActionList>
     </Section>
   )
 }

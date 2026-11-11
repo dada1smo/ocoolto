@@ -5,7 +5,7 @@ import { Section } from '../../ui/Section'
 
 const steps: [Icon, string, string][] = [
   [PeopleIcon, 'Crie o grupo', 'Só um nome e o seu e-mail.'],
-  [LinkIcon, 'Mande o convite', 'Cada pessoa entra pelo link.'],
+  [LinkIcon, 'Mande o convite', 'Entre direto pelo link.'],
   [GiftIcon, 'Sorteie', 'Cada um vê só quem tirou.'],
 ]
 

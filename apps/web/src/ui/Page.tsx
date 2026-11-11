@@ -16,7 +16,7 @@ export function Page({ children }: { children: ReactNode }) {
         <div className={`${container} flex h-14 items-center`}>
           <Link
             to="/"
-            className="flex items-center gap-2 font-semibold no-underline"
+            className="flex items-center gap-2 font-semibold no-underline!"
             style={{ color: 'var(--fgColor-default)', font: 'var(--text-title-shorthand-small)' }}
           >
             <span style={{ color: 'var(--fgColor-accent)' }}>
@@ -25,7 +25,7 @@ export function Page({ children }: { children: ReactNode }) {
             ocoolto
           </Link>
           {loggedIn && (
-            <Link to="/meus-grupos" className="ml-auto text-sm">
+            <Link to="/meus-grupos" className="ml-auto">
               Meus grupos
             </Link>
           )}
