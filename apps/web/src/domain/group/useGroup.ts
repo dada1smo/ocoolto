@@ -8,8 +8,10 @@ export type GroupData = Awaited<ReturnType<typeof fetchGroup>>
 export type MemberView = Extract<GroupData, { member: true }>
 export type Participant = MemberView['participants'][number]
 
-export const inviteText = (id: string, group: MemberView) =>
-  `${group.participants.find((p) => p.id === group.meId)?.name} te convidou para entrar no grupo de amigo ocoolto ${group.name}: ${location.origin}/g/${id}`
+export const inviteText = (id: string, group: MemberView) => {
+  const name = group.participants.find((p) => p.id === group.meId)?.name // root has no participant
+  return `${name ? `${name} te convidou` : 'Você foi convidado'} para entrar no grupo de amigo ocoolto ${group.name}: ${location.origin}/g/${id}`
+}
 
 export function useGroup(id: string) {
   const [group, setGroup] = useState<GroupData>()
