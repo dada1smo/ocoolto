@@ -74,6 +74,7 @@ export function AdminPanel({
       {confirming && (
         <ConfirmAction
           title="Sortear agora?"
+          tone="primary"
           confirmLabel={`Sortear ${count} pessoas`}
           onConfirm={async () => {
             await drawGroup(groupId)

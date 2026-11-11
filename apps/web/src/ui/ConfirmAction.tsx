@@ -8,12 +8,15 @@ export function ConfirmAction({
   confirmLabel,
   onConfirm,
   onClose,
+  tone = 'danger',
   children,
 }: {
   title: string
   confirmLabel: string
   onConfirm: () => Promise<unknown>
   onClose: () => void
+  /** danger for removals; primary (brand color) for irreversible but non-destructive actions */
+  tone?: 'danger' | 'primary'
   children: ReactNode
 }) {
   // returns true so a failed run (undefined) can be told apart from success
@@ -22,7 +25,7 @@ export function ConfirmAction({
     <ConfirmationDialog
       title={title}
       confirmButtonContent={confirmLabel}
-      confirmButtonType="danger"
+      confirmButtonType={tone}
       confirmButtonLoading={action.pending}
       cancelButtonContent="Cancelar"
       onClose={async (gesture) => {
