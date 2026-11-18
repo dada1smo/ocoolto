@@ -7,7 +7,7 @@ export function DrawTab({ groupId, group, onChange }: { groupId: string; group: 
   return (
     <div className="flex flex-col gap-6">
       <GroupDetails groupId={groupId} group={group} canEdit={group.isOwner} onChange={onChange} />
-      {group.meId && <TargetCard name={group.target?.name ?? null} />}
+      {group.meId && <TargetCard target={group.target} />}
       {group.isOwner && <AdminPanel groupId={groupId} group={group} onChange={onChange} />}
     </div>
   )

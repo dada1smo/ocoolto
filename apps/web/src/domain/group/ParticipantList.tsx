@@ -6,7 +6,7 @@ import { ConfirmAction } from '../../ui/ConfirmAction'
 import { CopyButton } from '../../ui/CopyButton'
 import { Section } from '../../ui/Section'
 import { PersonForm } from './PersonForm'
-import { formatEditedAt } from './WishesForm'
+import { WishesDialog } from './WishesDialog'
 import { addParticipant, inviteText, removeParticipant, type MemberView, type Participant } from './useGroup'
 
 const initials = (name: string) =>
@@ -138,14 +138,12 @@ export function ParticipantList({
       )}
 
       {viewing?.wishes && (
-        <Dialog
-          title={`Lista de desejos de ${viewing.name}`}
-          subtitle={viewing.wishesAt && `Editado em ${formatEditedAt(viewing.wishesAt)}`}
-          width="large"
+        <WishesDialog
+          name={viewing.name}
+          wishes={viewing.wishes}
+          wishesAt={viewing.wishesAt}
           onClose={() => setViewing(undefined)}
-        >
-          <p className="whitespace-pre-wrap wrap-break-word">{viewing.wishes}</p>
-        </Dialog>
+        />
       )}
 
       {removing && (

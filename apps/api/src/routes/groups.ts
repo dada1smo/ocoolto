@@ -70,7 +70,7 @@ export const groups = new Hono<AppEnv>()
 
     const isOwner = email === group.owner_email
     const nameOf = (id: string | null) => results.find((p) => p.id === id)?.name ?? null
-    const target = nameOf(me?.target_id ?? null)
+    const target = results.find((p) => p.id === me?.target_id)
     return c.json({
       ...base,
       drawnAt: group.drawn_at,
@@ -90,7 +90,7 @@ export const groups = new Hono<AppEnv>()
         wishes: p.wishes,
         wishesAt: p.wishes_at,
       })),
-      target: target ? { name: target } : null,
+      target: target ? { name: target.name, wishes: target.wishes, wishesAt: target.wishes_at } : null,
     })
   })
 
